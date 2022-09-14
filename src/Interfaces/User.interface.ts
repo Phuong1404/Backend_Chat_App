@@ -12,8 +12,8 @@ export default interface IUser extends Document {
     channel:[Object];
     status:number;//0.Chờ xác nhận,1.Đã xác nhận,2.Bị Khóa
     status_name:string;
-    date_create:Date;
-    date_update:Date;
+    time_create:Date;
+    time_update:Date;
     signup_token:string;
     is_online:boolean;
   }

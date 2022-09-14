@@ -6,6 +6,7 @@ import logging from "../Config/logging";
 import Config from "../Config/config";
 import signJWT from "../Functions/signJWT"
 import * as jwt from 'jsonwebtoken';
+import moment = require("moment");
 const NAMESPACE = 'User';
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -57,7 +58,8 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         phone: phone,
         birthday: birthday,
         gender: gender,
-        password: hash
+        password: hash,
+        time_create:moment()
       });
       return _user
         .save()
@@ -222,7 +224,7 @@ const changePassword = (req: Request, res: Response, next: NextFunction) => {
                   error: hashError
                 });
               }
-              User.findOneAndUpdate({ email: payload.email }, { password: hash })
+              User.findOneAndUpdate({ email: payload.email }, { password: hash,time_update:moment() })
                 .then((users) => {
                   return res.status(201).json({
                     message:"Done"
@@ -258,7 +260,7 @@ const changeInfomation = async (req: Request, res: Response, next: NextFunction)
 
   let { name, birthday, gender } = req.body;
 
-  User.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender })
+  User.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender,time_update:moment() })
     .then((users) => {
       return res.status(201).json({
         message:"Done"

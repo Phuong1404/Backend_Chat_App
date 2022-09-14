@@ -20,6 +20,8 @@ mongoose
         logging.error(NAMESPACE, error.message, error);
     })
 
+/** Connect Socket*/
+
 /** Log the request */
 app.use((req, res, next) => {
     /** Log the req */

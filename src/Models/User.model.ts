@@ -17,12 +17,13 @@ const UserSchema:Schema=new Schema({
     channel:[{
       _id:{type:String},
       name:{type:String},
+      avatar:{type:String},
       total_user:{type:String},
     }],
     status:{type:Number},//0.Chờ xác nhận,1.Đã xác nhận,2.Bị Khóa
     status_name:{type:String},
-    date_create:{type:Date},
-    date_update:{type:Date},
+    time_create:{type:Date},
+    time_update:{type:Date},
     signup_token:{type:String},
     is_online:{type:Boolean}
 })
