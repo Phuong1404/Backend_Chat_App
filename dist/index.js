@@ -7,6 +7,7 @@ const logging_1 = require("./Config/logging");
 const config_1 = require("./Config/config");
 const mongoose_1 = require("mongoose");
 const userRoutes = require("./Routes/User.route");
+const channelRoutes = require("./Routes/Channel.route");
 const NAMESPACE = 'Server';
 const app = express();
 /** Connect to Mongo */
@@ -18,6 +19,7 @@ mongoose_1.default
     .catch((error) => {
     logging_1.default.error(NAMESPACE, error.message, error);
 });
+/** Connect Socket*/
 /** Log the request */
 app.use((req, res, next) => {
     /** Log the req */
@@ -43,6 +45,7 @@ app.use((req, res, next) => {
 });
 /** Routes */
 app.use('/user', userRoutes);
+app.use('/channel', channelRoutes);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

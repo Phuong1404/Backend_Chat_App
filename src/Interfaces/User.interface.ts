@@ -10,6 +10,7 @@ export default interface IUser extends Document {
     password:string;
     contact:[Object];
     channel:[Object];
+    friend_request:[Object];
     status:number;//0.Chờ xác nhận,1.Đã xác nhận,2.Bị Khóa
     status_name:string;
     time_create:Date;

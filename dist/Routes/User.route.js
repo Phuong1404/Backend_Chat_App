@@ -8,8 +8,13 @@ router.post('/register', User_controller_1.default.register);
 router.post('/login', User_controller_1.default.login);
 router.get('/get/info', extractJWT_1.default, User_controller_1.default.getUser);
 router.get('/get/contact', extractJWT_1.default, User_controller_1.default.getContactUser);
+router.get('/get/friend/send', extractJWT_1.default, User_controller_1.default.getListSendFriend);
+router.get('/get/friend/receiver', extractJWT_1.default, User_controller_1.default.getListReceiverFriend);
 router.get('/get/channel', extractJWT_1.default, User_controller_1.default.getChannelUser);
 router.put('/update/password', extractJWT_1.default, User_controller_1.default.changePassword);
 router.put('/update/info', extractJWT_1.default, User_controller_1.default.changeInfomation);
+router.post('/send/friend', extractJWT_1.default, User_controller_1.default.SendFriendRequest);
+router.post('/cancel/friend', extractJWT_1.default, User_controller_1.default.CancelFriendRequest);
+router.post('/accept/friend', extractJWT_1.default, User_controller_1.default.AcceptFriendRequest);
 module.exports = router;
 //# sourceMappingURL=User.route.js.map

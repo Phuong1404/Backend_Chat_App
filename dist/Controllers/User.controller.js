@@ -16,13 +16,16 @@ const logging_1 = require("../Config/logging");
 const config_1 = require("../Config/config");
 const signJWT_1 = require("../Functions/signJWT");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 const NAMESPACE = 'User';
+//1. Kiểm tra token
 const validateToken = (req, res, next) => {
     logging_1.default.info(NAMESPACE, 'Token validated, user authorized.');
     return res.status(200).json({
         message: 'Token(s) validated'
     });
 };
+//2. Đăng ký
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { name, email, phone, birthday, gender, password } = req.body;
     //Kiểm tra số điện thoại và email tồn tại
@@ -61,11 +64,13 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
                 phone: phone,
                 birthday: birthday,
                 gender: gender,
-                password: hash
+                password: hash,
+                time_create: moment()
             });
             return _user
                 .save()
                 .then((user) => {
+                logging_1.default.info(NAMESPACE, 'User created successfully.');
                 return res.status(201).json({
                     user
                 });
@@ -79,6 +84,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 });
+//3. Đăng nhập
 const login = (req, res, next) => {
     let { username, password } = req.body;
     User_model_1.default.find({ $or: [{ email: username }, { phone: username }] })
@@ -104,6 +110,7 @@ const login = (req, res, next) => {
                         });
                     }
                     else if (token) {
+                        logging_1.default.info(NAMESPACE, 'User login successfully.');
                         return res.status(200).json({
                             message: 'Auth successful',
                             token: token,
@@ -126,14 +133,16 @@ const login = (req, res, next) => {
         });
     });
 };
+//4. Lấy thông tin người dùng
 const getUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     User_model_1.default.findOne({ email: payload.email })
-        .select('-password -contact -channel')
+        .select('-password -contact -channel -friend_request')
         .exec()
         .then((users) => {
+        logging_1.default.info(NAMESPACE, 'Get data user.');
         return res.status(200).json({
             data: users,
             count: 1
@@ -146,6 +155,7 @@ const getUser = (req, res, next) => {
         });
     });
 };
+//5. Lấy danh sách bạn bè
 const getContactUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
@@ -154,9 +164,10 @@ const getContactUser = (req, res, next) => {
         .select('contact')
         .exec()
         .then((users) => {
+        logging_1.default.info(NAMESPACE, 'Get list friend.');
         return res.status(200).json({
             data: users.contact,
-            count: 1
+            count: users.contact.length
         });
     })
         .catch((error) => {
@@ -166,6 +177,7 @@ const getContactUser = (req, res, next) => {
         });
     });
 };
+//6. Lấy danh sách kênh
 const getChannelUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
@@ -174,9 +186,10 @@ const getChannelUser = (req, res, next) => {
         .select('channel')
         .exec()
         .then((users) => {
+        logging_1.default.info(NAMESPACE, 'Get data channel.');
         return res.status(200).json({
             data: users.channel,
-            count: 1
+            count: users.channel.length
         });
     })
         .catch((error) => {
@@ -186,6 +199,7 @@ const getChannelUser = (req, res, next) => {
         });
     });
 };
+//7. Đổi mật khẩu
 const changePassword = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
@@ -215,8 +229,9 @@ const changePassword = (req, res, next) => {
                                 error: hashError
                             });
                         }
-                        User_model_1.default.findOneAndUpdate({ email: payload.email }, { password: hash })
-                            .then((users) => {
+                        User_model_1.default.findOneAndUpdate({ email: payload.email }, { password: hash, time_update: moment() })
+                            .then(() => {
+                            logging_1.default.info(NAMESPACE, 'Change password user.');
                             return res.status(201).json({
                                 message: "Done"
                             });
@@ -243,17 +258,235 @@ const changePassword = (req, res, next) => {
         });
     }
 };
+//8. Đổi thông tin tài khoản
 const changeInfomation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { name, birthday, gender } = req.body;
-    User_model_1.default.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender })
-        .then((users) => {
+    User_model_1.default.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
+        .then(() => {
+        logging_1.default.info(NAMESPACE, 'Change info user.');
         return res.status(201).json({
             message: "Done"
         });
     });
 });
-exports.default = { validateToken, register, login, getUser, getContactUser, getChannelUser, changePassword, changeInfomation };
+//9. Lấy danh sách lời mời kết bạn
+const getListReceiverFriend = (req, res, next) => {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    User_model_1.default.findOne({ email: payload.email })
+        .select('friend_request')
+        .exec()
+        .then((users) => {
+        let result = [];
+        for (let item in users.friend_request) {
+            if (users.friend_request[item]['type'] == 0) {
+                result.push(users.friend_request[item]);
+            }
+        }
+        logging_1.default.info(NAMESPACE, 'List friend request send.');
+        return res.status(200).json({
+            data: result,
+            count: result.length
+        });
+    })
+        .catch((error) => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+};
+//10. Lấy danh sách đã gửi lời mờis
+const getListSendFriend = (req, res, next) => {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    User_model_1.default.findOne({ email: payload.email })
+        .select('friend_request')
+        .exec()
+        .then((users) => {
+        let result = [];
+        for (let item in users.friend_request) {
+            if (users.friend_request[item]['type'] == 1) {
+                result.push(users.friend_request[item]);
+            }
+        }
+        logging_1.default.info(NAMESPACE, 'List friend request receiver.');
+        return res.status(200).json({
+            data: result,
+            count: result.length
+        });
+    })
+        .catch((error) => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+};
+//11. Yêu cầu kết bạn
+const SendFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    let { receiver_id } = req.body;
+    let receiver = yield User_model_1.default.findOne({ _id: receiver_id }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    let sender = yield User_model_1.default.findOne({ email: payload.email }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    if (receiver.friend_request.findIndex((val) => (val['to'] == receiver_id && val['from'] == sender._id)) != -1) {
+        return res.status(401).json({
+            message: "Was send",
+        });
+    }
+    else {
+        let friend_request_1 = {
+            from: sender._id,
+            to: receiver._id,
+            time: moment(),
+            status: 0,
+            status_name: "Was send",
+            type: 1,
+            type_name: "Send"
+        };
+        let friend_request_0 = {
+            from: sender._id,
+            to: receiver._id,
+            time: moment(),
+            status: 0,
+            status_name: "Was send",
+            type: 0,
+            type_name: "Receiver"
+        };
+        let friend_request_send = sender.friend_request;
+        let friend_request_receiver = receiver.friend_request;
+        friend_request_send.push(friend_request_1);
+        friend_request_receiver.push(friend_request_0);
+        User_model_1.default.findOneAndUpdate({ email: payload.email }, { friend_request: friend_request_send })
+            .then(() => {
+            User_model_1.default.findOneAndUpdate({ _id: receiver_id }, { friend_request: friend_request_receiver })
+                .then(() => {
+                logging_1.default.info(NAMESPACE, 'Send friend request.');
+                return res.status(201).json({
+                    message: "Done"
+                });
+            });
+        });
+    }
+});
+//12. Hủy yêu cầu
+const CancelFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    let { send_id } = req.body;
+    let receiver = yield User_model_1.default.findOne({ email: payload.email }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    let sender = yield User_model_1.default.findOne({ _id: send_id }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    let send_req = sender.friend_request.findIndex((val) => (val['from'] == send_id && val['to'] == receiver._id));
+    let rec_req = receiver.friend_request.findIndex((val) => (val['from'] == send_id && val['to'] == receiver._id));
+    if (send_req == -1 || rec_req == -1) {
+        return res.status(401).json({
+            message: "Request not found"
+        });
+    }
+    else {
+        let temp1_send = sender.friend_request.slice(0, send_req);
+        let temp2_send = sender.friend_request.slice(send_req + 1, sender.friend_request.length);
+        let temp_send = temp1_send.concat(temp2_send);
+        let temp1_rec = receiver.friend_request.slice(0, rec_req);
+        let temp2_rec = receiver.friend_request.slice(rec_req + 1, receiver.friend_request.length);
+        let temp_rec = temp1_rec.concat(temp2_rec);
+        User_model_1.default.findOneAndUpdate({ _id: sender._id }, { friend_request: temp_send })
+            .then(() => {
+            User_model_1.default.findOneAndUpdate({ _id: receiver._id }, { friend_request: temp_rec })
+                .then(() => {
+                logging_1.default.info(NAMESPACE, 'Cancel friend request.');
+                return res.status(201).json({
+                    message: "Done"
+                });
+            });
+        });
+    }
+});
+//13.Chấp thuận yêu cầu
+const AcceptFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    let { send_id } = req.body;
+    let receiver = yield User_model_1.default.findOne({ email: payload.email }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    let sender = yield User_model_1.default.findOne({ _id: send_id }).
+        select('_id friend_request')
+        .exec()
+        .then((users) => {
+        return users;
+    });
+    let send_req = sender.friend_request.findIndex((val) => (val['from'] == send_id && val['to'] == receiver._id));
+    let rec_req = receiver.friend_request.findIndex((val) => (val['from'] == send_id && val['to'] == receiver._id));
+    if (send_req == -1 || rec_req == -1) {
+        return res.status(401).json({
+            message: "Request not found"
+        });
+    }
+    else {
+        let friend_request_1 = sender.friend_request[send_req];
+        let friend_request_0 = receiver.friend_request[rec_req];
+        friend_request_1['status'] = 1;
+        friend_request_0['status'] = 1;
+        friend_request_0['status_name'] = "Was accept";
+        friend_request_1['status_name'] = "Was accept";
+        let temp1_send = sender.friend_request.slice(0, send_req);
+        temp1_send.push(friend_request_1);
+        let temp2_send = sender.friend_request.slice(send_req + 1, sender.friend_request.length);
+        let temp_send = temp1_send.concat(temp2_send);
+        let temp1_rec = receiver.friend_request.slice(0, rec_req);
+        temp1_rec.push(friend_request_0);
+        let temp2_rec = receiver.friend_request.slice(rec_req + 1, receiver.friend_request.length);
+        let temp_rec = temp1_rec.concat(temp2_rec);
+        User_model_1.default.findOneAndUpdate({ _id: sender._id }, { friend_request: temp_send })
+            .then(() => {
+            User_model_1.default.findOneAndUpdate({ _id: receiver._id }, { friend_request: temp_rec })
+                .then(() => {
+                logging_1.default.info(NAMESPACE, 'Accept friend request.');
+                return res.status(201).json({
+                    message: "Done"
+                });
+            });
+        });
+    }
+});
+//14. Find user by email ,name, phone
+exports.default = {
+    validateToken, register, login, getUser, changeInfomation,
+    getContactUser, getChannelUser, changePassword,
+    getListReceiverFriend, getListSendFriend, SendFriendRequest,
+    CancelFriendRequest, AcceptFriendRequest
+};
 //# sourceMappingURL=User.controller.js.map

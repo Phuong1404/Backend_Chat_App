@@ -20,6 +20,15 @@ const UserSchema:Schema=new Schema({
       avatar:{type:String},
       total_user:{type:String},
     }],
+    friend_request:[{
+      from:{type:String},
+      to:{type:String},
+      time:{type:Date},
+      status:{type:Number},
+      status_name:{type:String},
+      type:{type:Number},//0 receive, 1 send
+      type_name:{type:String}
+    }],
     status:{type:Number},//0.Chờ xác nhận,1.Đã xác nhận,2.Bị Khóa
     status_name:{type:String},
     time_create:{type:Date},

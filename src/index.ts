@@ -6,7 +6,7 @@ import Config from './Config/config';
 import mongoose from 'mongoose'
 
 import * as userRoutes from './Routes/User.route'
-
+import * as channelRoutes from './Routes/Channel.route'
 const NAMESPACE = 'Server';
 const app = express()
 
@@ -51,8 +51,8 @@ app.use((req, res, next) => {
     next();
 });
 /** Routes */
-app.use('/user',userRoutes)
-
+app.use('/user', userRoutes)
+app.use('/channel',channelRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

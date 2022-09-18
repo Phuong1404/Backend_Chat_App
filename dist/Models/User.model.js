@@ -17,12 +17,22 @@ const UserSchema = new mongoose_1.Schema({
     channel: [{
             _id: { type: String },
             name: { type: String },
+            avatar: { type: String },
             total_user: { type: String },
+        }],
+    friend_request: [{
+            from: { type: String },
+            to: { type: String },
+            time: { type: Date },
+            status: { type: Number },
+            status_name: { type: String },
+            type: { type: Number },
+            type_name: { type: String }
         }],
     status: { type: Number },
     status_name: { type: String },
-    date_create: { type: Date },
-    date_update: { type: Date },
+    time_create: { type: Date },
+    time_update: { type: Date },
     signup_token: { type: String },
     is_online: { type: Boolean }
 });
