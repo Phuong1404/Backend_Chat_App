@@ -11,6 +11,7 @@ const signJWT = (user, callback) => {
     logging_1.default.info(NAMESPACE, `Attempting to sign token for ${user._id}`);
     try {
         jwt.sign({
+            id: user._id,
             name: user.name,
             email: user.email
         }, config_1.default.server.token.secret, {

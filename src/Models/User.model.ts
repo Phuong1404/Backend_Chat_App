@@ -18,7 +18,6 @@ const UserSchema:Schema=new Schema({
       _id:{type:String},
       name:{type:String},
       avatar:{type:String},
-      total_user:{type:String},
     }],
     friend_request:[{
       from:{type:String},

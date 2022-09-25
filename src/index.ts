@@ -4,9 +4,10 @@ import * as express from 'express'
 import logging from './Config/logging'
 import Config from './Config/config';
 import mongoose from 'mongoose'
-
+import * as messageRoutes from './Routes/Message.route'
 import * as userRoutes from './Routes/User.route'
 import * as channelRoutes from './Routes/Channel.route'
+import { ServerSocket } from './Socket/socket';
 const NAMESPACE = 'Server';
 const app = express()
 
@@ -21,6 +22,9 @@ mongoose
     })
 
 /** Connect Socket*/
+const httpServer = http.createServer(app);
+export const socket = new ServerSocket(httpServer);
+
 
 /** Log the request */
 app.use((req, res, next) => {
@@ -52,7 +56,8 @@ app.use((req, res, next) => {
 });
 /** Routes */
 app.use('/user', userRoutes)
-app.use('/channel',channelRoutes)
+app.use('/channel', channelRoutes)
+app.use('/message', messageRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');
@@ -62,6 +67,5 @@ app.use((req, res, next) => {
     });
 });
 
-const httpServer = http.createServer(app);
 
 httpServer.listen(Config.server.port, () => logging.info(NAMESPACE, `Server is running ${Config.server.hostname}:${Config.server.port}`));

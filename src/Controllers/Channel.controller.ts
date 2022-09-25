@@ -10,6 +10,23 @@ import moment = require("moment");
 
 const NAMESPACE = "Channel"
 
+const FindRole = (arr, id) => {
+    for (let item in arr) {
+        if (arr[item]['user_id'] == id) {
+            return item
+        }
+    }
+    return -1
+}
+const FindExist = (arr, id) => {
+    for (let item in arr) {
+        if (arr[item]['_id'] == id) {
+            return item
+        }
+    }
+    return -1
+}
+
 //1. Tạo channel
 const CreateChannel = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = String(req.headers['authorization'] || '')
@@ -21,7 +38,7 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
     if (listUser.length < 2) {
         let ListUser = []
 
-        let user1 = await User.findOne({ email: payload.email })
+        let user1 = await User.findOne({ _id: payload.id })
             .select('_id name avatar')
             .exec()
             .then((users) => {
@@ -37,7 +54,6 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
             .select('_id name avatar')
             .exec()
             .then((users) => {
-                console.log(users)
                 return {
                     _id: users._id,
                     name: users.name,
@@ -71,8 +87,8 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
     }
     else {
         let ListUser = []
-        let user1 = await User.findOne({ email: payload.email })
-            .select('_id name avatar email')
+        let user1 = await User.findOne({ _id: payload.id })
+            .select('_id name avatar email channel')
             .exec()
             .then((users) => {
                 return {
@@ -80,22 +96,26 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
                     name: users.name,
                     nickname: "",
                     avatar: users.avatar,
-                    email: users.email
+                    email: users.email,
+                    channel: users.channel
                 }
             })
         ListUser.push(user1)
+
         for (let item in listUser) {
             let User2 = await User.findOne({ _id: listUser[item] })
-                .select('_id name avatar')
+                .select('_id name avatar channel')
                 .exec()
                 .then((users) => {
                     return {
                         _id: users._id,
                         name: users.name,
                         nickname: "",
-                        avatar: users.avatar
+                        avatar: users.avatar,
+                        channel: users.channel
                     }
                 })
+            console.log(User2)
             ListUser.push(User2)
         }
         let _Channel = new Channel({
@@ -114,9 +134,23 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
                 set_role: true
             }
         })
+
         return _Channel
             .save()
             .then((channel) => {
+                for (let item in ListUser) {
+                    let Val = {
+                        _id: channel._id,
+                        name: name,
+                        avatar: avatar,
+                    }
+                    let ListCh = []
+                    ListCh = ListUser[item].channel
+                    console.log(ListCh)
+                    ListCh.push(Val)
+                    User.findByIdAndUpdate({ _id: ListUser[item]._id }, { channel: ListCh })
+                        .then()
+                }
                 return res.status(201).json({
                     channel
                 });
@@ -131,18 +165,157 @@ const CreateChannel = async (req: Request, res: Response, next: NextFunction) =>
 
 }
 
-//2. Lấy Danh sách channel người dùng
+//2. Out channel
+const OutChannel = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = String(req.headers['authorization'] || '')
 
-//3. Out channel
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, Config.server.token.secret)
+
+    const channel_id = req.params.id
+
+    let user = await User.findOne({ _id: payload.id })
+        .select('_id')
+        .exec()
+        .then((users) => {
+            return users
+        })
+
+    Channel.findOne({ _id: channel_id })
+        .select('nickname')
+        .exec()
+        .then((channel) => {
+            if (channel != null) {
+                let index = FindExist(channel.nickname, user._id)
+                if (index == -1) {
+                    return res.status(401).json({
+                        message: "You aren't in the channel"
+                    })
+                }
+                else {
+                    let Nickname = channel.nickname.filter((value, index, arr) => {
+                        return value['_id'] != user._id
+                    })
+                    Channel.findByIdAndUpdate({ _id: channel_id }, { nickname: Nickname, num_member: Nickname.length })
+                        .then(() => {
+                            logging.info(NAMESPACE, 'Out channel success')
+                            return res.status(201).json({
+                                message: "Done"
+                            })
+                        })
+                }
+            }
+            else {
+                return res.status(401).json({
+                    message: "Channel not found"
+                })
+            }
+        })
+}
+
+//3. Thêm vào channel
+const AddToChannel = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = String(req.headers['authorization'] || '')
+
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, Config.server.token.secret)
+
+    const channel_id = req.params.id
+    const { list_user } = req.body
+
+    let useradd = await User.findOne({ _id: payload.id })
+        .select('_id')
+        .exec()
+        .then((users) => {
+            return users
+        })
+    let NewUser = []
+    for (let i in list_user) {
+        let usernew = await User.findOne({ _id: list_user[i] })
+            .select('_id name avatar channel')
+            .exec()
+            .then((users) => {
+                return {
+                    _id: users._id,
+                    name: users.name,
+                    nickname: "",
+                    avatar: users.avatar,
+                    channel: users.channel
+                }
+            })
+        NewUser.push(usernew)
+    }
+
+    Channel.findOne({ _id: channel_id })
+        .select('nickname role avatar name')
+        .exec()
+        .then((channel) => {
+            if (channel != null) {
+                let index = FindRole(channel.role, useradd._id)
+                if (index == -1) {
+                    return res.status(401).json({
+                        message: "You are not in the channel"
+                    });
+                }
+                else {
+                    if (channel.role[index]['add_member'] == true) {
+                        let nickNameVal = []
+                        for (let i in NewUser) {
+                            if (FindExist(channel.nickname, NewUser[i]._id) != -1) {
+                                return res.status(401).json({
+                                    message: "User already exists in the channel"
+                                });
+                            }
+                            else {
+                                nickNameVal.push(NewUser[i])
+                            }
+                        }
+                        for (let item in channel.nickname) {
+                            nickNameVal.push(channel.nickname[item])
+                        }
+
+                        Channel.findByIdAndUpdate({ _id: channel_id }, { nickname: nickNameVal, num_member: nickNameVal.length })
+                            .then(() => {
+                                for (let item in NewUser) {
+                                    let Val = {
+                                        _id: channel._id,
+                                        name: channel.name,
+                                        avatar: channel.avatar,
+                                    }
+                                    let ListCh = NewUser[item].channel
+                                    ListCh.push(Val)
+                                    User.findByIdAndUpdate({ _id: NewUser[item]._id }, { channel: ListCh })
+                                        .then()
+                                }
+                                logging.info(NAMESPACE, 'Add user to channel success')
+                                return res.status(201).json({
+                                    message: "Done"
+                                })
+                            })
+                    }
+                    else {
+                        return res.status(401).json({
+                            message: "You don't have permission"
+                        });
+                    }
+                }
+            }
+            else {
+                return res.status(401).json({
+                    message: "Channel not found"
+                })
+            }
+        })
+}
 
 //4. Sửa tên avartar
 
-//5. Đôi nickname
+//5. Đổi nickname
 
 //6. Cấp role
 
 //7. Tất bật chuông channel
 
 export default {
-    CreateChannel
+    CreateChannel, OutChannel, AddToChannel
 }

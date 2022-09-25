@@ -4,16 +4,12 @@ const mongoose_1 = require("mongoose");
 const MessageSchema = new mongoose_1.Schema({
     content: { type: String },
     time: { type: Date },
-    user: [{
-            _id: { type: String },
-            name: { type: String },
-            avatar: { type: String }
-        }],
-    channel: [{
-            _id: { type: String },
-            name: { type: String },
-            avatar: { type: String },
-        }],
+    user: {
+        _id: { type: String },
+        name: { type: String },
+        avatar: { type: String }
+    },
+    channel_id: { type: String },
     attachment: [{
             _id: { type: String },
             type: { type: Number },

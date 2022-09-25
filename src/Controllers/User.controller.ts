@@ -138,7 +138,7 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.substring(7, authHeader.length);
   const payload = jwt.verify(token, Config.server.token.secret)
 
-  User.findOne({ email: payload.email })
+  User.findOne({ _id: payload.id })
     .select('-password -contact -channel -friend_request')
     .exec()
     .then((users) => {
@@ -163,7 +163,7 @@ const getContactUser = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.substring(7, authHeader.length);
   const payload = jwt.verify(token, Config.server.token.secret)
 
-  User.findOne({ email: payload.email })
+  User.findOne({ _id: payload.id })
     .select('contact')
     .exec()
     .then((users) => {
@@ -188,7 +188,7 @@ const getChannelUser = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.substring(7, authHeader.length);
   const payload = jwt.verify(token, Config.server.token.secret)
 
-  User.findOne({ email: payload.email })
+  User.findOne({ _id: payload.id })
     .select('channel')
     .exec()
     .then((users) => {
@@ -214,7 +214,7 @@ const changePassword = (req: Request, res: Response, next: NextFunction) => {
 
   let { oldpassword, password, repassword } = req.body;
   if (password == repassword) {
-    User.findOne({ email: payload.email })
+    User.findOne({ _id: payload.id })
       .select('password')
       .exec()
       .then((users) => {
@@ -236,7 +236,7 @@ const changePassword = (req: Request, res: Response, next: NextFunction) => {
                   error: hashError
                 });
               }
-              User.findOneAndUpdate({ email: payload.email }, { password: hash, time_update: moment() })
+              User.findOneAndUpdate({ _id: payload.id }, { password: hash, time_update: moment() })
                 .then(() => {
                   logging.info(NAMESPACE, 'Change password user.');
                   return res.status(201).json({
@@ -274,7 +274,7 @@ const changeInfomation = async (req: Request, res: Response, next: NextFunction)
 
   let { name, birthday, gender } = req.body;
 
-  User.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
+  User.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
     .then(() => {
       logging.info(NAMESPACE, 'Change info user.');
       return res.status(201).json({
@@ -290,7 +290,7 @@ const getListReceiverFriend = (req: Request, res: Response, next: NextFunction) 
   const token = authHeader.substring(7, authHeader.length);
   const payload = jwt.verify(token, Config.server.token.secret)
 
-  User.findOne({ email: payload.email })
+  User.findOne({ _id: payload.id })
     .select('friend_request')
     .exec()
     .then((users) => {
@@ -321,7 +321,7 @@ const getListSendFriend = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.substring(7, authHeader.length);
   const payload = jwt.verify(token, Config.server.token.secret)
 
-  User.findOne({ email: payload.email })
+  User.findOne({ _id: payload.id })
     .select('friend_request')
     .exec()
     .then((users) => {
@@ -359,7 +359,7 @@ const SendFriendRequest = async (req: Request, res: Response, next: NextFunction
     .then((users) => {
       return users
     })
-  let sender = await User.findOne({ email: payload.email }).
+  let sender = await User.findOne({ _id: payload.id }).
     select('_id friend_request')
     .exec()
     .then((users) => {
@@ -394,7 +394,7 @@ const SendFriendRequest = async (req: Request, res: Response, next: NextFunction
     friend_request_send.push(friend_request_1)
     friend_request_receiver.push(friend_request_0)
 
-    User.findOneAndUpdate({ email: payload.email }, { friend_request: friend_request_send })
+    User.findOneAndUpdate({ _id: payload.id }, { friend_request: friend_request_send })
       .then(() => {
         User.findOneAndUpdate({ _id: receiver_id }, { friend_request: friend_request_receiver })
           .then(() => {
@@ -416,7 +416,7 @@ const CancelFriendRequest = async (req: Request, res: Response, next: NextFuncti
 
   let { send_id } = req.body
 
-  let receiver = await User.findOne({ email: payload.email }).
+  let receiver = await User.findOne({ _id: payload.id }).
     select('_id friend_request')
     .exec()
     .then((users) => {
@@ -469,7 +469,7 @@ const AcceptFriendRequest = async (req: Request, res: Response, next: NextFuncti
 
   let { send_id } = req.body
 
-  let receiver = await User.findOne({ email: payload.email }).
+  let receiver = await User.findOne({ _id: payload.id }).
     select('_id friend_request')
     .exec()
     .then((users) => {

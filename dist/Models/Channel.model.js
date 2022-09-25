@@ -16,7 +16,7 @@ const ChannelSchema = new mongoose_1.Schema({
             avatar: { type: String },
         }],
     show_from: [{
-            user_id: { type: String },
+            _id: { type: String },
             from_time: { type: Date }
         }],
     attachment: [{

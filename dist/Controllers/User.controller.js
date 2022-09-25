@@ -138,7 +138,7 @@ const getUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    User_model_1.default.findOne({ email: payload.email })
+    User_model_1.default.findOne({ _id: payload.id })
         .select('-password -contact -channel -friend_request')
         .exec()
         .then((users) => {
@@ -160,7 +160,7 @@ const getContactUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    User_model_1.default.findOne({ email: payload.email })
+    User_model_1.default.findOne({ _id: payload.id })
         .select('contact')
         .exec()
         .then((users) => {
@@ -182,7 +182,7 @@ const getChannelUser = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    User_model_1.default.findOne({ email: payload.email })
+    User_model_1.default.findOne({ _id: payload.id })
         .select('channel')
         .exec()
         .then((users) => {
@@ -206,7 +206,7 @@ const changePassword = (req, res, next) => {
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { oldpassword, password, repassword } = req.body;
     if (password == repassword) {
-        User_model_1.default.findOne({ email: payload.email })
+        User_model_1.default.findOne({ _id: payload.id })
             .select('password')
             .exec()
             .then((users) => {
@@ -229,7 +229,7 @@ const changePassword = (req, res, next) => {
                                 error: hashError
                             });
                         }
-                        User_model_1.default.findOneAndUpdate({ email: payload.email }, { password: hash, time_update: moment() })
+                        User_model_1.default.findOneAndUpdate({ _id: payload.id }, { password: hash, time_update: moment() })
                             .then(() => {
                             logging_1.default.info(NAMESPACE, 'Change password user.');
                             return res.status(201).json({
@@ -264,7 +264,7 @@ const changeInfomation = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { name, birthday, gender } = req.body;
-    User_model_1.default.findOneAndUpdate({ email: payload.email }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
+    User_model_1.default.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
         .then(() => {
         logging_1.default.info(NAMESPACE, 'Change info user.');
         return res.status(201).json({
@@ -277,7 +277,7 @@ const getListReceiverFriend = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    User_model_1.default.findOne({ email: payload.email })
+    User_model_1.default.findOne({ _id: payload.id })
         .select('friend_request')
         .exec()
         .then((users) => {
@@ -305,7 +305,7 @@ const getListSendFriend = (req, res, next) => {
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    User_model_1.default.findOne({ email: payload.email })
+    User_model_1.default.findOne({ _id: payload.id })
         .select('friend_request')
         .exec()
         .then((users) => {
@@ -340,7 +340,7 @@ const SendFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         .then((users) => {
         return users;
     });
-    let sender = yield User_model_1.default.findOne({ email: payload.email }).
+    let sender = yield User_model_1.default.findOne({ _id: payload.id }).
         select('_id friend_request')
         .exec()
         .then((users) => {
@@ -374,7 +374,7 @@ const SendFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         let friend_request_receiver = receiver.friend_request;
         friend_request_send.push(friend_request_1);
         friend_request_receiver.push(friend_request_0);
-        User_model_1.default.findOneAndUpdate({ email: payload.email }, { friend_request: friend_request_send })
+        User_model_1.default.findOneAndUpdate({ _id: payload.id }, { friend_request: friend_request_send })
             .then(() => {
             User_model_1.default.findOneAndUpdate({ _id: receiver_id }, { friend_request: friend_request_receiver })
                 .then(() => {
@@ -392,7 +392,7 @@ const CancelFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { send_id } = req.body;
-    let receiver = yield User_model_1.default.findOne({ email: payload.email }).
+    let receiver = yield User_model_1.default.findOne({ _id: payload.id }).
         select('_id friend_request')
         .exec()
         .then((users) => {
@@ -436,7 +436,7 @@ const AcceptFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { send_id } = req.body;
-    let receiver = yield User_model_1.default.findOne({ email: payload.email }).
+    let receiver = yield User_model_1.default.findOne({ _id: payload.id }).
         select('_id friend_request')
         .exec()
         .then((users) => {
