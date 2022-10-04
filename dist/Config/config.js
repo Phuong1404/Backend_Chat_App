@@ -13,13 +13,15 @@ const MONGO_OPTIONS = {
 };
 const MONGO_USERNAME = process.env.MONGO_USERNAME || 'admin';
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'admin';
-const MONGO_HOST = process.env.MONGO_HOST || `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
+const MONGO_HOST = `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
+//const MONGO_HOST = process.env.MONGO_HOST || `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
 const MONGO = {
     host: MONGO_HOST,
     password: MONGO_PASSWORD,
     username: MONGO_USERNAME,
     options: MONGO_OPTIONS,
-    url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}` /*`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`*/
+    url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
+    //url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}` /*`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`*/
 };
 const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || 'localhost';
 const SERVER_PORT = process.env.SERVER_PORT || 8088;

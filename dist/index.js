@@ -11,7 +11,6 @@ const messageRoutes = require("./Routes/Message.route");
 const userRoutes = require("./Routes/User.route");
 const channelRoutes = require("./Routes/Channel.route");
 const socket_1 = require("./Socket/socket");
-const path = require("path");
 const cors = require("cors");
 const NAMESPACE = 'Server';
 const app = express();
@@ -62,8 +61,5 @@ app.use((req, res, next) => {
         message: error.message
     });
 });
-const publicPathDirectory = path.join(__dirname, "/public/files");
-console.log(publicPathDirectory);
-app.use(express.static(__dirname + 'public'));
 httpServer.listen(config_1.default.server.port, () => logging_1.default.info(NAMESPACE, `Server is running ${config_1.default.server.hostname}:${config_1.default.server.port}`));
 //# sourceMappingURL=index.js.map

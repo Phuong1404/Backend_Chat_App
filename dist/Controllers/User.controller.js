@@ -502,6 +502,11 @@ const AcceptFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
 });
 //14. Find user by email ,name, phone
+const FindUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let { data } = req.body;
+    //let User.find({$or:[{'name':data}, {'phone':data},{'email':data}]})
+});
+//15. List Page
 exports.default = {
     validateToken, register, login, getUser, changeInfomation,
     getContactUser, getChannelUser, changePassword,
