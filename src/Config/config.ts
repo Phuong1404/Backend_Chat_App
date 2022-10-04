@@ -12,9 +12,12 @@ const MONGO_OPTIONS = {
     retryWrites: true
 };
 
-const MONGO_USERNAME = process.env.MONGO_USERNAME || 'admin';
-const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'admin';
-const MONGO_HOST = `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
+const MONGO_USERNAME = 'phuong_1404' || 'admin';
+const MONGO_PASSWORD = '14042001Aa' || 'admin';
+const MONGO_HOST = `phuongerpdata.krqve.mongodb.net/test`;
+// const MONGO_USERNAME = process.env.MONGO_USERNAME || 'admin';
+// const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'admin';
+// const MONGO_HOST = `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
 //const MONGO_HOST = process.env.MONGO_HOST || `localhost:27017/ChatApp?authMechanism=DEFAULT&authSource=chatapp`;
 
 const MONGO = {
