@@ -21,9 +21,11 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 //2. Đăng ký
 const register = async (req: Request, res: Response, next: NextFunction) => {
   let { name, email, phone, birthday, gender, password } = req.body;
-
-  //Kiểm tra số điện thoại và email tồn tại
-
+  let RequestFile = req.files
+  let file = ""
+  if (RequestFile) {
+    file = `http://localhost:8088/${RequestFile[0].path}`
+  }
   let PhoneExist = await User.exists({ phone })
     .exec()
     .then((phones) => {
@@ -61,6 +63,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         birthday: birthday,
         gender: gender,
         password: hash,
+        avatar: file,
         time_create: moment()
       });
       return _user
@@ -273,14 +276,27 @@ const changeInfomation = async (req: Request, res: Response, next: NextFunction)
   const payload = jwt.verify(token, Config.server.token.secret)
 
   let { name, birthday, gender } = req.body;
-
-  User.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
-    .then(() => {
-      logging.info(NAMESPACE, 'Change info user.');
-      return res.status(201).json({
-        message: "Done"
-      });
+  let RequestFile = req.files
+  let user = await User.findOne({ _id: payload.id })
+    .then((user) => {
+      return {
+        avatar: user.avatar
+      }
     })
+  if (!RequestFile) {
+    let avatar = user.avatar
+  }
+  else {
+    let avatar=`http://localhost:8088/${RequestFile[0].path}`
+    console.log(RequestFile[0].path)
+  }
+  // User.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
+  //   .then(() => {
+  //     logging.info(NAMESPACE, 'Change info user.');
+  //     return res.status(201).json({
+  //       message: "Done"
+  //     });
+  //   })
 }
 
 //9. Lấy danh sách lời mời kết bạn
@@ -524,7 +540,12 @@ const AcceptFriendRequest = async (req: Request, res: Response, next: NextFuncti
 }
 
 //14. Find user by email ,name, phone
+const FindUser = async (req: Request, res: Response, next: NextFunction) => {
+  let { data } = req.body
+  //let User.find({$or:[{'name':data}, {'phone':data},{'email':data}]})
 
+}
+//15. List Page
 export default {
   validateToken, register, login, getUser, changeInfomation,
   getContactUser, getChannelUser, changePassword,

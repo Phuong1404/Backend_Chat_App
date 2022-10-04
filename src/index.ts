@@ -8,6 +8,9 @@ import * as messageRoutes from './Routes/Message.route'
 import * as userRoutes from './Routes/User.route'
 import * as channelRoutes from './Routes/Channel.route'
 import { ServerSocket } from './Socket/socket';
+import * as path from 'path'
+import * as cors from 'cors';
+
 const NAMESPACE = 'Server';
 const app = express()
 
@@ -40,9 +43,9 @@ app.use((req, res, next) => {
 });
 
 /** Parse the body of the request */
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
+app.use(cors());
 /** Rules of our API */
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');

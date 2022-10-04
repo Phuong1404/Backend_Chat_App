@@ -11,6 +11,8 @@ const messageRoutes = require("./Routes/Message.route");
 const userRoutes = require("./Routes/User.route");
 const channelRoutes = require("./Routes/Channel.route");
 const socket_1 = require("./Socket/socket");
+const path = require("path");
+const cors = require("cors");
 const NAMESPACE = 'Server';
 const app = express();
 /** Connect to Mongo */
@@ -36,8 +38,9 @@ app.use((req, res, next) => {
     next();
 });
 /** Parse the body of the request */
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 /** Rules of our API */
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -59,5 +62,8 @@ app.use((req, res, next) => {
         message: error.message
     });
 });
+const publicPathDirectory = path.join(__dirname, "/public/files");
+console.log(publicPathDirectory);
+app.use(express.static(__dirname + 'public'));
 httpServer.listen(config_1.default.server.port, () => logging_1.default.info(NAMESPACE, `Server is running ${config_1.default.server.hostname}:${config_1.default.server.port}`));
 //# sourceMappingURL=index.js.map

@@ -19,6 +19,16 @@ const UserSchema:Schema=new Schema({
       name:{type:String},
       avatar:{type:String},
     }],
+    page:[{
+      _id:{type:String},
+      name:{type:String},
+      avatar:{type:String},
+    }],
+    group:[{
+      _id:{type:String},
+      name:{type:String},
+      avatar:{type:String},
+    }],
     friend_request:[{
       from:{type:String},
       to:{type:String},

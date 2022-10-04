@@ -1,10 +1,11 @@
 "use strict";
 const express = require("express");
 const extractJWT_1 = require("../Middleware/extractJWT");
+const uploadImage_1 = require("../Middleware/uploadImage");
 const User_controller_1 = require("../Controllers/User.controller");
 const router = express.Router();
 router.get('/validate', extractJWT_1.default, User_controller_1.default.validateToken);
-router.post('/register', User_controller_1.default.register);
+router.post('/register', (0, uploadImage_1.default)(), User_controller_1.default.register);
 router.post('/login', User_controller_1.default.login);
 router.get('/get/info', extractJWT_1.default, User_controller_1.default.getUser);
 router.get('/get/contact', extractJWT_1.default, User_controller_1.default.getContactUser);
@@ -12,7 +13,7 @@ router.get('/get/friend/send', extractJWT_1.default, User_controller_1.default.g
 router.get('/get/friend/receiver', extractJWT_1.default, User_controller_1.default.getListReceiverFriend);
 router.get('/get/channel', extractJWT_1.default, User_controller_1.default.getChannelUser);
 router.put('/update/password', extractJWT_1.default, User_controller_1.default.changePassword);
-router.put('/update/info', extractJWT_1.default, User_controller_1.default.changeInfomation);
+router.put('/update/info', extractJWT_1.default, (0, uploadImage_1.default)(), User_controller_1.default.changeInfomation);
 router.post('/send/friend', extractJWT_1.default, User_controller_1.default.SendFriendRequest);
 router.post('/cancel/friend', extractJWT_1.default, User_controller_1.default.CancelFriendRequest);
 router.post('/accept/friend', extractJWT_1.default, User_controller_1.default.AcceptFriendRequest);

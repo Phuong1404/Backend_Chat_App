@@ -28,7 +28,11 @@ const validateToken = (req, res, next) => {
 //2. Đăng ký
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { name, email, phone, birthday, gender, password } = req.body;
-    //Kiểm tra số điện thoại và email tồn tại
+    let RequestFile = req.files;
+    let file = "";
+    if (RequestFile) {
+        file = `http://localhost:8088/${RequestFile[0].path}`;
+    }
     let PhoneExist = yield User_model_1.default.exists({ phone })
         .exec()
         .then((phones) => {
@@ -65,6 +69,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
                 birthday: birthday,
                 gender: gender,
                 password: hash,
+                avatar: file,
                 time_create: moment()
             });
             return _user
@@ -264,13 +269,27 @@ const changeInfomation = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
     let { name, birthday, gender } = req.body;
-    User_model_1.default.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
-        .then(() => {
-        logging_1.default.info(NAMESPACE, 'Change info user.');
-        return res.status(201).json({
-            message: "Done"
-        });
+    let RequestFile = req.files;
+    let user = yield User_model_1.default.findOne({ _id: payload.id })
+        .then((user) => {
+        return {
+            avatar: user.avatar
+        };
     });
+    if (!RequestFile) {
+        let avatar = user.avatar;
+    }
+    else {
+        let avatar = `http://localhost:8088/${RequestFile[0].path}`;
+        console.log(RequestFile[0].path);
+    }
+    // User.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
+    //   .then(() => {
+    //     logging.info(NAMESPACE, 'Change info user.');
+    //     return res.status(201).json({
+    //       message: "Done"
+    //     });
+    //   })
 });
 //9. Lấy danh sách lời mời kết bạn
 const getListReceiverFriend = (req, res, next) => {
