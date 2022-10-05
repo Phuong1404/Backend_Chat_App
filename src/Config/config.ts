@@ -12,8 +12,8 @@ const MONGO_OPTIONS = {
     retryWrites: true
 };
 
-const MONGO_USERNAME = 'phuong_1404' || 'admin';
-const MONGO_PASSWORD = '14042001Aa' || 'admin';
+const MONGO_USERNAME = 'phuong_1404';
+const MONGO_PASSWORD = '14042001Aa';
 const MONGO_HOST = `phuongerpdata.krqve.mongodb.net/test`;
 // const MONGO_USERNAME = process.env.MONGO_USERNAME || 'admin';
 // const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'admin';
@@ -25,7 +25,7 @@ const MONGO = {
     password: MONGO_PASSWORD,
     username: MONGO_USERNAME,
     options: MONGO_OPTIONS,
-    url:`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
+    url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
     //url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}` /*`mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`*/
 };
 
