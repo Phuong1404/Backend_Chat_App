@@ -30,7 +30,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let { name, email, phone, birthday, gender, password } = req.body;
     let RequestFile = req.files;
     let file = "";
-    if (RequestFile) {
+    if (RequestFile.length > 0) {
         file = `http://localhost:8088/${RequestFile[0].path}`;
     }
     let PhoneExist = yield User_model_1.default.exists({ phone })

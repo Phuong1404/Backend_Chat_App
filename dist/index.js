@@ -15,6 +15,7 @@ const cors = require("cors");
 const NAMESPACE = 'Server';
 const app = express();
 /** Connect to Mongo */
+console.log(config_1.default.mongo.url);
 mongoose_1.default
     .connect(config_1.default.mongo.url, config_1.default.mongo.options)
     .then((result) => {

@@ -15,6 +15,7 @@ const NAMESPACE = 'Server';
 const app = express()
 
 /** Connect to Mongo */
+console.log(Config.mongo.url)
 mongoose
     .connect(Config.mongo.url, Config.mongo.options)
     .then((result) => {

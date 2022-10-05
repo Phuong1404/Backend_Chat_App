@@ -23,7 +23,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
   let { name, email, phone, birthday, gender, password } = req.body;
   let RequestFile = req.files
   let file = ""
-  if (RequestFile) {
+  if (RequestFile.length > 0) {
     file = `http://localhost:8088/${RequestFile[0].path}`
   }
   let PhoneExist = await User.exists({ phone })
@@ -287,7 +287,7 @@ const changeInfomation = async (req: Request, res: Response, next: NextFunction)
     let avatar = user.avatar
   }
   else {
-    let avatar=`http://localhost:8088/${RequestFile[0].path}`
+    let avatar = `http://localhost:8088/${RequestFile[0].path}`
     console.log(RequestFile[0].path)
   }
   // User.findOneAndUpdate({ _id: payload.id }, { name: name, birthday: birthday, gender: gender, time_update: moment() })
