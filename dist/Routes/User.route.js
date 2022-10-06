@@ -9,6 +9,8 @@ router.post('/register', (0, uploadImage_1.default)(), User_controller_1.default
 router.post('/login', User_controller_1.default.login);
 router.get('/get/info', extractJWT_1.default, User_controller_1.default.getUser);
 router.get('/get/contact', extractJWT_1.default, User_controller_1.default.getContactUser);
+router.get('/get/page', extractJWT_1.default, User_controller_1.default.getPageUser);
+router.get('/get/group', extractJWT_1.default, User_controller_1.default.getGroupUser);
 router.get('/get/friend/send', extractJWT_1.default, User_controller_1.default.getListSendFriend);
 router.get('/get/friend/receiver', extractJWT_1.default, User_controller_1.default.getListReceiverFriend);
 router.get('/get/channel', extractJWT_1.default, User_controller_1.default.getChannelUser);

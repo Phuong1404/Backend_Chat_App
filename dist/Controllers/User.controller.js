@@ -518,12 +518,55 @@ const ListChannelChat = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     const authHeader = String(req.headers['authorization'] || '');
     const token = authHeader.substring(7, authHeader.length);
     const payload = jwt.verify(token, config_1.default.server.token.secret);
-    Mess;
 });
+//16. Find ListPage
+const getPageUser = (req, res, next) => {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    User_model_1.default.findOne({ _id: payload.id })
+        .select('page')
+        .exec()
+        .then((users) => {
+        logging_1.default.info(NAMESPACE, 'Get data page.');
+        return res.status(200).json({
+            data: users.channel,
+            count: users.channel.length
+        });
+    })
+        .catch((error) => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+};
+const getGroupUser = (req, res, next) => {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    User_model_1.default.findOne({ _id: payload.id })
+        .select('group')
+        .exec()
+        .then((users) => {
+        logging_1.default.info(NAMESPACE, 'Get data group.');
+        return res.status(200).json({
+            data: users.channel,
+            count: users.channel.length
+        });
+    })
+        .catch((error) => {
+        return res.status(500).json({
+            message: error.message,
+            error
+        });
+    });
+};
 exports.default = {
     validateToken, register, login, getUser, changeInfomation,
     getContactUser, getChannelUser, changePassword,
     getListReceiverFriend, getListSendFriend, SendFriendRequest,
-    CancelFriendRequest, AcceptFriendRequest, FindUser
+    CancelFriendRequest, AcceptFriendRequest, FindUser,
+    getGroupUser, getPageUser
 };
 //# sourceMappingURL=User.controller.js.map
