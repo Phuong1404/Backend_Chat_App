@@ -17,5 +17,6 @@ router.put('/update/info', extractJWT_1.default, (0, uploadImage_1.default)(), U
 router.post('/send/friend', extractJWT_1.default, User_controller_1.default.SendFriendRequest);
 router.post('/cancel/friend', extractJWT_1.default, User_controller_1.default.CancelFriendRequest);
 router.post('/accept/friend', extractJWT_1.default, User_controller_1.default.AcceptFriendRequest);
+router.get('/find/user', User_controller_1.default.FindUser);
 module.exports = router;
 //# sourceMappingURL=User.route.js.map

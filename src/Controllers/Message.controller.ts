@@ -4,6 +4,7 @@ import Config from "../Config/config";
 import User from "../Models/User.model"
 import Channel from "../Models/Channel.model";
 import Message from "../Models/Message.model"
+import ChatHistory from "../Models/ChatHistory.model";
 import * as jwt from 'jsonwebtoken';
 import moment = require("moment");
 
@@ -146,6 +147,7 @@ const SendMessage = async (req: Request, res: Response, next: NextFunction) => {
         .save()
         .then((message) => {
             logging.info(NAMESPACE, 'Send message success')
+
             return res.status(201).json({
                 message
             })

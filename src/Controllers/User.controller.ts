@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import User from '../Models/User.model'
+import Message from '../Models/Message.model'
+import Channel from '../Models/Channel.model'
 import * as bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import logging from "../Config/logging";
@@ -542,13 +544,74 @@ const AcceptFriendRequest = async (req: Request, res: Response, next: NextFuncti
 //14. Find user by email ,name, phone
 const FindUser = async (req: Request, res: Response, next: NextFunction) => {
   let { data } = req.body
-  //let User.find({$or:[{'name':data}, {'phone':data},{'email':data}]})
+  User.find({ $or: [{ name: { $regex: data } }, { 'phone': data }, { 'email': data }] })
+    .select('_id name avatar')
+    .then((user) => {
+      return {
+        data: user,
+        count: user.length
+      }
+    })
 
 }
-//15. List Page
+//15. List Friend Chat
+const ListChannelChat = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = String(req.headers['authorization'] || '')
+
+  const token = authHeader.substring(7, authHeader.length);
+  const payload = jwt.verify(token, Config.server.token.secret)
+}
+//16. Find ListPage
+const getPageUser = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = String(req.headers['authorization'] || '')
+
+  const token = authHeader.substring(7, authHeader.length);
+  const payload = jwt.verify(token, Config.server.token.secret)
+
+  User.findOne({ _id: payload.id })
+    .select('page')
+    .exec()
+    .then((users) => {
+      logging.info(NAMESPACE, 'Get data page.');
+      return res.status(200).json({
+        data: users.channel,
+        count: users.channel.length
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({
+        message: error.message,
+        error
+      });
+    });
+}
+const getGroupUser = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = String(req.headers['authorization'] || '')
+
+  const token = authHeader.substring(7, authHeader.length);
+  const payload = jwt.verify(token, Config.server.token.secret)
+
+  User.findOne({ _id: payload.id })
+    .select('group')
+    .exec()
+    .then((users) => {
+      logging.info(NAMESPACE, 'Get data group.');
+      return res.status(200).json({
+        data: users.channel,
+        count: users.channel.length
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({
+        message: error.message,
+        error
+      });
+    });
+}
 export default {
   validateToken, register, login, getUser, changeInfomation,
   getContactUser, getChannelUser, changePassword,
   getListReceiverFriend, getListSendFriend, SendFriendRequest,
-  CancelFriendRequest, AcceptFriendRequest
+  CancelFriendRequest, AcceptFriendRequest, FindUser,
+  getGroupUser,getPageUser
 }

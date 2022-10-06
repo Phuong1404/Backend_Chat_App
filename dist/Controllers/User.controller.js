@@ -504,13 +504,26 @@ const AcceptFriendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0
 //14. Find user by email ,name, phone
 const FindUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { data } = req.body;
-    //let User.find({$or:[{'name':data}, {'phone':data},{'email':data}]})
+    User_model_1.default.find({ $or: [{ name: { $regex: data } }, { 'phone': data }, { 'email': data }] })
+        .select('_id name avatar')
+        .then((user) => {
+        return {
+            data: user,
+            count: user.length
+        };
+    });
 });
-//15. List Page
+//15. List Friend Chat
+const ListChannelChat = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const authHeader = String(req.headers['authorization'] || '');
+    const token = authHeader.substring(7, authHeader.length);
+    const payload = jwt.verify(token, config_1.default.server.token.secret);
+    Mess;
+});
 exports.default = {
     validateToken, register, login, getUser, changeInfomation,
     getContactUser, getChannelUser, changePassword,
     getListReceiverFriend, getListSendFriend, SendFriendRequest,
-    CancelFriendRequest, AcceptFriendRequest
+    CancelFriendRequest, AcceptFriendRequest, FindUser
 };
 //# sourceMappingURL=User.controller.js.map
