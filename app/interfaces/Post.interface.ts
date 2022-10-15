@@ -1,0 +1,15 @@
+import { Document } from "mongoose";
+export default interface IPost extends Document {
+    content:string;
+    time:Date;
+    user:Object;
+    time_create:Date;
+    time_update:Date;
+    react:[Object];
+    attachment:[Object];
+    total_react:Number;
+    status:Number;
+    status_type:string;
+    page_id:string;
+    group_id:string;
+}

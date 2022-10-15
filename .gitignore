@@ -2,4 +2,5 @@
 
 /src/public/files
 
+.env
 package-lock.json
