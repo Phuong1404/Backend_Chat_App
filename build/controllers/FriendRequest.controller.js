@@ -17,9 +17,7 @@ const User_model_1 = require("../models/User.model");
 const sendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let { recever_id } = req.body;
-        console.log(recever_id);
         const request1 = yield FriendRequest_model_1.default.findOne({ $and: [{ 'recever': recever_id }, { 'sender': req.user['_id'] }] });
-        console.log(request1);
         if (request1) {
             return res.status(400).json({ message: "Đã gửi lời mời" });
         }

@@ -25,6 +25,10 @@ const MessageSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: "Message"
     },
+    invisible_to: [{
+            type: mongoose_1.default.Types.ObjectId,
+            ref: "User"
+        }],
     attachment: [{
             type: mongoose_1.default.Types.ObjectId,
             ref: "Attachment"
@@ -36,5 +40,5 @@ const MessageSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
-module.exports = mongoose_1.default.model("Message", MessageSchema);
+exports.default = mongoose_1.default.model("Message", MessageSchema);
 //# sourceMappingURL=Message.model.js.map

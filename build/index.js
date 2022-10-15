@@ -11,6 +11,7 @@ const authRoutes = require("./routes/Auth.route");
 const userRoutes = require("./routes/User.route");
 const requestRoutes = require("./routes/FriendRequest.route");
 const channelRoutes = require("./routes/Channel.route");
+const messageRoutes = require("./routes/Message.route");
 const cors = require("cors");
 //------------------------------------
 require('./models/Channel.model');
@@ -64,6 +65,7 @@ app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/request', requestRoutes);
 app.use('/channel', channelRoutes);
+app.use('/message', messageRoutes);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

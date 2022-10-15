@@ -7,9 +7,7 @@ import User from '../models/User.model'
 const sendRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let { recever_id } = req.body
-        console.log(recever_id)
         const request1 = await FriendRequest.findOne({ $and: [{ 'recever': recever_id }, { 'sender': req.user['_id'] }] })
-        console.log(request1)
         if (request1) {
             return res.status(400).json({ message: "Đã gửi lời mời" });
         }

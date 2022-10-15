@@ -26,6 +26,10 @@ const MessageSchema: Schema = new Schema(
             type: mongoose.Types.ObjectId,
             ref: "Message"
         },
+        invisible_to: [{
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        }],
         attachment: [{
             type: mongoose.Types.ObjectId,
             ref: "Attachment"
@@ -39,4 +43,4 @@ const MessageSchema: Schema = new Schema(
         timestamps: true,
     }
 )
-module.exports = mongoose.model<IMessage>("Message", MessageSchema)
+export default mongoose.model<IMessage>("Message", MessageSchema)

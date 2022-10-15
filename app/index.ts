@@ -9,6 +9,7 @@ import * as authRoutes from './routes/Auth.route'
 import * as userRoutes from './routes/User.route'
 import * as requestRoutes from './routes/FriendRequest.route'
 import * as channelRoutes from './routes/Channel.route'
+import * as messageRoutes from './routes/Message.route'
 import * as path from 'path'
 import * as cors from 'cors';
 //------------------------------------
@@ -71,6 +72,7 @@ app.use('/auth', authRoutes)
 app.use('/user', userRoutes)
 app.use('/request', requestRoutes)
 app.use('/channel', channelRoutes)
+app.use('/message', messageRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

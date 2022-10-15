@@ -7,7 +7,7 @@ export default interface IMessage extends Document {
     status_name:string;
     time_create:Date;
     time_update:Date;
-    visible_to:[string];//hiển thị với người dùng
+    invisible_to:[string];//hiển thị với người dùng
     react:[Object];
     foward:string;//trả lời với tin nhắn
     attachment:[Object];//tệp đính kèm
