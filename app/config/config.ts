@@ -11,14 +11,14 @@ const MONGO_OPTIONS = {
     retryWrites: true
 };
 //Data deploy
-// const MONGO_USERNAME = 'phuong_1404';
-// const MONGO_PASSWORD = '14042001Aa';
-// const MONGO_HOST = `phuongerpdata.krqve.mongodb.net/Social_Network`;
+const MONGO_USERNAME = 'phuong_1404';
+const MONGO_PASSWORD = '14042001Aa';
+const MONGO_HOST = `cluster0.lt8aq68.mongodb.net/Social_Network`;
 
 //Data local
-const MONGO_USERNAME = 'admin';
-const MONGO_PASSWORD = 'admin';
-const MONGO_HOST = `localhost:27017/Social_Network?authMechanism=DEFAULT&authSource=Social_Network`;
+// const MONGO_USERNAME = 'admin';
+// const MONGO_PASSWORD = 'admin';
+// const MONGO_HOST = `localhost:27017/Social_Network?authMechanism=DEFAULT&authSource=Social_Network`;
 
 const MONGO = {
     host: MONGO_HOST,
@@ -26,10 +26,10 @@ const MONGO = {
     username: MONGO_USERNAME,
     options: MONGO_OPTIONS,
     //Deploy
-    //url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
+    url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
 
     //Local
-    url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
+    // url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
 };
 
 const SERVER_HOSTNAME = 'localhost' || process.env.SERVER_HOSTNAME;
