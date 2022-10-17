@@ -16,6 +16,9 @@ const Channel_model_1 = require("../models/Channel.model");
 //Nếu có trong invisible ko hiện
 const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const page = Number(req.query.page) * 1 || 1;
+        const limit = Number(req.query.limit) * 1 || 10;
+        const skip = (page - 1) * limit;
         const channel_id = req.params.id;
         const channel = yield Channel_model_1.default.findById(channel_id);
         if (!channel) {
@@ -25,8 +28,15 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" });
         }
-        const message = yield Message_model_1.default.find({ channel: channel_id });
-        res.json({ data: message });
+        const message = yield Message_model_1.default.find({ channel: String(channel_id) }).skip(skip).limit(limit);
+        const List_Message = [];
+        for (let mess in message) {
+            let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']));
+            if (!is_delete) {
+                List_Message.push(message[mess]);
+            }
+        }
+        res.json({ data: List_Message });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
@@ -46,12 +56,13 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
             res.status(400).json({ message: "This not your channel" });
         }
         const newMessage = new Message_model_1.default({
-            _id: mongoose_1.default.Types.ObjectId,
+            _id: new mongoose_1.default.Types.ObjectId,
             user: req.user['_id'],
             status: 0,
             status_name: "Active",
             reply: reply,
-            channel: channel_id
+            channel: channel_id,
+            content: content
         });
         newMessage.save();
         res.json({ data: newMessage });
@@ -75,6 +86,7 @@ const removeMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             status: 1,
             status_name: "Remove"
         });
+        return res.json({ message: "Remove success" });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
@@ -91,16 +103,40 @@ const deleteMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (String(message.user) != String(req.user['_id'])) {
             res.status(400).json({ message: "Message is not your" });
         }
+        let is_delete = message.invisible_to.find(user => String(user) == String(req.user['_id']));
+        if (is_delete) {
+            return res.json({ message: "Was delete" });
+        }
         yield Message_model_1.default.findByIdAndUpdate({ _id: message_id }, {
             $push: { invisible_to: req.user['_id'] }
         });
+        return res.json({ message: "Delete success" });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
     }
 });
 //5.React tin nhắn
+const reactMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const message_id = req.params.id;
+    const { emoji } = req.body;
+    const message = yield Message_model_1.default.findById(message_id);
+    if (!message) {
+        res.status(400).json({ message: "Message not exist" });
+    }
+    if (String(message.user) != String(req.user['_id'])) {
+        res.status(400).json({ message: "Message is not your" });
+    }
+    const react = {
+        user: req.user['_id'],
+        emoji: emoji
+    };
+    yield Message_model_1.default.findByIdAndUpdate({ _id: message_id }, {
+        $push: { react: react }
+    });
+    return res.json({ message: "React succsess" });
+});
 exports.default = {
-    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel
+    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel, reactMessage
 };
 //# sourceMappingURL=Message.controller.js.map

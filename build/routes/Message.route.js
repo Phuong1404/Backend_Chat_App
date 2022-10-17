@@ -7,5 +7,6 @@ router.get('/channel/:id', extractJWT_1.default, Message_controller_1.default.ge
 router.post('/send/:id', extractJWT_1.default, Message_controller_1.default.chatMessageInChannel);
 router.patch('/remove/:id', extractJWT_1.default, Message_controller_1.default.removeMessage);
 router.patch('/delete/:id', extractJWT_1.default, Message_controller_1.default.deleteMessage);
+router.patch('/react/:id', extractJWT_1.default, Message_controller_1.default.reactMessage);
 module.exports = router;
 //# sourceMappingURL=Message.route.js.map
