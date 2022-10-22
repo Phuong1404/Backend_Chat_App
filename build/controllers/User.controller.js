@@ -10,6 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = require("../models/User.model");
+const Attachment_model_1 = require("../models/Attachment.model");
+const mongoose_1 = require("mongoose");
+const cloudinary = require("cloudinary");
 //1. Lấy thông tin người dùng
 const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -17,6 +20,7 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             .select("-password")
             .populate("friend", "_id name avatar")
             .populate("channel", "_id name avatar num_member")
+            .populate("avatar", "-_id link")
             .populate("friend_request");
         if (!user) {
             return res.status(400).json({ message: "User does not exist." });
@@ -33,7 +37,8 @@ const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         let { data } = req.body;
         const user = yield User_model_1.default.find({ $or: [{ name: { $regex: data } }, { 'phone': data }, { 'email': data }] })
             .limit(10)
-            .select('_id name avatar');
+            .select('_id name')
+            .populate("avatar", "-_id link");
         res.json({ data: user });
     }
     catch (error) {
@@ -43,15 +48,45 @@ const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 //3. Cập nhật người dùng
 const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let { name, birthday, gender, avatar, address, job } = req.body;
+        let { name, birthday, gender, address, job } = req.body;
+        //Gán hình ảnh
+        const avatar = req.file;
+        let avatar_name, format_type, type_name, size = "";
+        let type = 0;
+        if (avatar) {
+            avatar_name = avatar.filename;
+            format_type = avatar.mimetype;
+            type_name = "Image";
+            size = String(avatar.size);
+        }
+        //Tạo hình ảnh mới
+        const newAttachment = new Attachment_model_1.default({
+            _id: new mongoose_1.default.Types.ObjectId(),
+            name: avatar_name,
+            size: size,
+            format_type: format_type,
+            type: type,
+            type_name: type_name
+        });
         yield User_model_1.default.findOneAndUpdate({ _id: req.user['_id'] }, {
             name,
-            avatar,
             birthday,
             gender,
+            avatar: newAttachment._id,
             address,
             job
         });
+        yield newAttachment.save();
+        //---------------------------------------------------
+        cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+            yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                link: result.url,
+                user: req.user['_id'],
+                res_model: "User",
+                res_id: req.user['_id']
+            });
+        }));
+        //---------------------------------------------------
         res.json({ message: "Update success!" });
     }
     catch (error) {

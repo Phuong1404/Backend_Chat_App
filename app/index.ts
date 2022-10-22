@@ -12,6 +12,7 @@ import * as channelRoutes from './routes/Channel.route'
 import * as messageRoutes from './routes/Message.route'
 import * as path from 'path'
 import * as cors from 'cors';
+import * as cloudinary from 'cloudinary'
 //------------------------------------
 require('./models/Channel.model')
 require('./models/User.model')
@@ -23,6 +24,12 @@ require('./models/Notification.model')
 
 const NAMESPACE = 'Server';
 const app = express()
+/** Connect Cloudinary */
+cloudinary.v2.config({
+    cloud_name: 'dhb7ha8no',
+    api_key: '478952913943714',
+    api_secret: 'Ukrcg0n1MGn9k4kMAH7jmmmIp00'
+});
 /** Connect to Mongo */
 console.log(config.mongo.url)
 mongoose

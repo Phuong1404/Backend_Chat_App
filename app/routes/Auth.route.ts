@@ -2,8 +2,9 @@ import * as express from 'express'
 import controller from '../controllers/Auth.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
+import uploadImage from '../Middleware/uploadImage'
 
-router.post("/register", controller.Register);
+router.post("/register", uploadImage.single("avatar"), controller.Register);
 
 router.post("/login", controller.Login);
 

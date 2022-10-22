@@ -10,35 +10,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = require("../models/User.model");
+const Attachment_model_1 = require("../models/Attachment.model");
 const logging_1 = require("../config/logging");
 const config_1 = require("../config/config");
+const mongoose_1 = require("mongoose");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary");
 const NAMESPACE = 'Auth';
 const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let { name, email, phone, birthday, gender, avatar, password } = req.body;
+        let { name, email, phone, birthday, gender, password } = req.body;
+        //Gán hình ảnh
+        const avatar = req.file;
+        let avatar_name, format_type, type_name, size = "";
+        let type = 0;
+        if (avatar) {
+            avatar_name = avatar.filename;
+            format_type = avatar.mimetype;
+            type_name = "Image";
+            size = String(avatar.size);
+        }
+        //Kiểm tra điều kiện tồn tại
         const user_email = yield User_model_1.default.findOne({ email });
+        const user_phone = yield User_model_1.default.findOne({ phone });
         if (user_email) {
             return res.status(400).json({ message: "Email này đã tồn tại." });
+        }
+        if (user_phone) {
+            return res.status(400).json({ message: "Số điện thoại này đã tồn tại." });
         }
         if (password.length < 6) {
             return res.status(400).json({ message: "Mật khẩu phải ít nhất 6 kí tự." });
         }
+        //Tạo hình ảnh mới
+        const newAttachment = new Attachment_model_1.default({
+            _id: new mongoose_1.default.Types.ObjectId(),
+            name: avatar_name,
+            size: size,
+            format_type: format_type,
+            type: type,
+            type_name: type_name
+        });
+        //Tạo người dùng mới
         const passwordHash = yield bcrypt.hash(password, 12);
         const newUser = new User_model_1.default({
+            _id: new mongoose_1.default.Types.ObjectId(),
             name: name,
             email: email,
             phone: phone,
             birthday: birthday,
             password: passwordHash,
             gender: gender,
-            avatar: avatar,
+            avatar: newAttachment._id,
             status: 0,
             status_name: "Active",
             time_create: moment()
         });
+        //Tạo token mới
         const access_token = createAccessToken({ id: newUser._id });
         const refresh_token = createRefreshToken({ id: newUser._id });
         res.cookie("refreshtoken", refresh_token, {
@@ -47,6 +77,17 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
         });
         yield newUser.save();
+        yield newAttachment.save();
+        //---------------------------------------------------
+        cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+            yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                link: result.url,
+                user: newUser._id,
+                res_model: "User",
+                res_id: newUser._id
+            });
+        }));
+        //---------------------------------------------------
         res.json({
             message: "Đăng kí thành công!",
             access_token,

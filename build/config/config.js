@@ -44,7 +44,7 @@ const SERVER = {
 };
 const config = {
     mongo: MONGO,
-    server: SERVER
+    server: SERVER,
 };
 exports.default = config;
 //# sourceMappingURL=config.js.map

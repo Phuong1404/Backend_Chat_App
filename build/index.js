@@ -13,6 +13,7 @@ const requestRoutes = require("./routes/FriendRequest.route");
 const channelRoutes = require("./routes/Channel.route");
 const messageRoutes = require("./routes/Message.route");
 const cors = require("cors");
+const cloudinary = require("cloudinary");
 //------------------------------------
 require('./models/Channel.model');
 require('./models/User.model');
@@ -23,6 +24,12 @@ require('./models/Notification.model');
 //------------------------------------
 const NAMESPACE = 'Server';
 const app = express();
+/** Connect Cloudinary */
+cloudinary.v2.config({
+    cloud_name: 'dhb7ha8no',
+    api_key: '478952913943714',
+    api_secret: 'Ukrcg0n1MGn9k4kMAH7jmmmIp00'
+});
 /** Connect to Mongo */
 console.log(config_1.default.mongo.url);
 mongoose_1.default

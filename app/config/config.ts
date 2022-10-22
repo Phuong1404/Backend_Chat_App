@@ -50,7 +50,7 @@ const SERVER = {
 
 const config = {
     mongo: MONGO,
-    server: SERVER
+    server: SERVER,
 };
 
 export default config;

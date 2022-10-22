@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const Message_model_1 = require("../models/Message.model");
 const Channel_model_1 = require("../models/Channel.model");
+const Attachment_model_1 = require("../models/Attachment.model");
+const cloudinary = require("cloudinary");
 //1.Lấy tất cả tin nhắn trong 1 channel
 //Nếu có trong invisible ko hiện
 const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,6 +57,22 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" });
         }
+        //-----------Setup_file------------------------------
+        //Cần định dạng lại file
+        const fileAttachment = req.file;
+        let file_name, format_type, size = "";
+        if (fileAttachment) {
+            file_name = fileAttachment.filename;
+            format_type = fileAttachment.mimetype;
+            size = String(fileAttachment.size);
+        }
+        const newAttachment = new Attachment_model_1.default({
+            _id: new mongoose_1.default.Types.ObjectId(),
+            name: file_name,
+            size: size,
+            format_type: format_type,
+        });
+        //----------------------------------------------------
         const newMessage = new Message_model_1.default({
             _id: new mongoose_1.default.Types.ObjectId,
             user: req.user['_id'],
@@ -62,9 +80,21 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
             status_name: "Active",
             reply: reply,
             channel: channel_id,
-            content: content
+            content: content,
+            attachment: newAttachment._id
         });
         newMessage.save();
+        yield newAttachment.save();
+        //---------------------------------------------------
+        cloudinary.v2.uploader.upload(fileAttachment.path, { resource_type: "raw" }).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+            yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                link: result.url,
+                user: req.user['_id'],
+                res_model: "Message",
+                res_id: newMessage._id
+            });
+        }));
+        //---------------------------------------------------
         res.json({ data: newMessage });
     }
     catch (error) {

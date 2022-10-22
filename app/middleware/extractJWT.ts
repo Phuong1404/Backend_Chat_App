@@ -17,7 +17,7 @@ const extractJWT = async (req: Request, res: Response, next: NextFunction) => {
         if (!decoded) {
             return res.status(400).json({ message: "Unauthorized." });
         }
-        const user = await User.findOne({ _id: decoded.id });
+        const user = await User.findOne({ _id: decoded['id'] });
         req.user = user;
         next();
     } catch (error) {

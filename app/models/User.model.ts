@@ -9,8 +9,8 @@ const UserSchema: Schema = new Schema(
         birthday: { type: Date, min: '1900-01-01', max: '2200-12-31' },
         gender: { type: String, required: true },
         avatar: {
-            type: String,
-            default: "https://res.cloudinary.com/abc123124/image/upload/v1644652997/test/avatar_uom8nm.png"
+            type: mongoose.Types.ObjectId,
+            ref: "Attachment"
         },
         address: { type: String, maxlength: 300 },
         job: { type: String },

@@ -8,10 +8,16 @@ const AttachmentSchema: Schema = new Schema(
         format_type: { type: String },
         type: { type: Number },
         type_name: { type: String },
-        time_upload: { type: Date }
+        link: { type: String },
+        user: {
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        },
+        res_model: { type: String },
+        res_id: { type: String }
     },
     {
         timestamps: true,
     }
 )
-module.exports = mongoose.model<IAttachment>("Attachment", AttachmentSchema)
+export default mongoose.model<IAttachment>("Attachment", AttachmentSchema)

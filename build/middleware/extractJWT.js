@@ -26,7 +26,7 @@ const extractJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (!decoded) {
             return res.status(400).json({ message: "Unauthorized." });
         }
-        const user = yield User_model_1.default.findOne({ _id: decoded.id });
+        const user = yield User_model_1.default.findOne({ _id: decoded['id'] });
         req.user = user;
         next();
     }

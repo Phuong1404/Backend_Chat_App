@@ -5,5 +5,8 @@ export default interface IAttachment extends Document {
     format_type: string;
     type: Number;
     type_name: string;
-    time_upload: Date;
+    link: string;
+    user: string;
+    res_model: string;
+    res_id: string;
 }

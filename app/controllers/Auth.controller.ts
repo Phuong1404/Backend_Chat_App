@@ -1,38 +1,66 @@
 import { NextFunction, Request, Response } from "express";
 import User from '../models/User.model'
+import Attachment from '../models/Attachment.model'
 import logging from "../config/logging";
 import config from "../config/config";
+import mongoose, { model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as moment from "moment";
 import * as jwt from 'jsonwebtoken';
+import * as cloudinary from 'cloudinary'
 
 const NAMESPACE = 'Auth'
 
 const Register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let { name, email, phone, birthday, gender, avatar, password } = req.body;
-
+        let { name, email, phone, birthday, gender, password } = req.body;
+        //Gán hình ảnh
+        const avatar = req.file
+        let avatar_name, format_type, type_name, size = ""
+        let type = 0
+        if (avatar) {
+            avatar_name = avatar.filename
+            format_type = avatar.mimetype
+            type_name = "Image"
+            size = String(avatar.size)
+        }
+        //Kiểm tra điều kiện tồn tại
         const user_email = await User.findOne({ email });
+        const user_phone = await User.findOne({ phone });
         if (user_email) {
             return res.status(400).json({ message: "Email này đã tồn tại." });
+        }
+        if (user_phone) {
+            return res.status(400).json({ message: "Số điện thoại này đã tồn tại." });
         }
         if (password.length < 6) {
             return res.status(400).json({ message: "Mật khẩu phải ít nhất 6 kí tự." });
         }
+        //Tạo hình ảnh mới
+        const newAttachment = new Attachment({
+            _id: new mongoose.Types.ObjectId(),
+            name: avatar_name,
+            size: size,
+            format_type: format_type,
+            type: type,
+            type_name: type_name
+        })
+        //Tạo người dùng mới
         const passwordHash = await bcrypt.hash(password, 12);
-
         const newUser = new User({
+            _id: new mongoose.Types.ObjectId(),
             name: name,
             email: email,
             phone: phone,
             birthday: birthday,
             password: passwordHash,
             gender: gender,
-            avatar: avatar,
+            avatar: newAttachment._id,
             status: 0,// 0. còn dùng,1. bị khóa
             status_name: "Active",
             time_create: moment()
         })
+        //Tạo token mới
         const access_token = createAccessToken({ id: newUser._id });
         const refresh_token = createRefreshToken({ id: newUser._id });
         res.cookie("refreshtoken", refresh_token, {
@@ -40,7 +68,22 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
             path: "/auth/refresh_token",
             maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
         });
+
         await newUser.save();
+        await newAttachment.save();
+        //---------------------------------------------------
+        cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
+            await Attachment.findByIdAndUpdate(
+                { _id: newAttachment._id },
+                {
+                    link: result.url,
+                    user: newUser._id,
+                    res_model: "User",
+                    res_id: newUser._id
+                }
+            )
+        })
+        //---------------------------------------------------
         res.json({
             message: "Đăng kí thành công!",
             access_token,
@@ -160,5 +203,5 @@ const ChangePass = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 export default {
-    Register, Login, GenerateAccessToken, Logout,ChangePass
+    Register, Login, GenerateAccessToken, Logout, ChangePass
 }
