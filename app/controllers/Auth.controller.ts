@@ -37,61 +37,97 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(400).json({ message: "Mật khẩu phải ít nhất 6 kí tự." });
         }
         //Tạo hình ảnh mới
-        const newAttachment = new Attachment({
-            _id: new mongoose.Types.ObjectId(),
-            name: avatar_name,
-            size: size,
-            format_type: format_type,
-            type: type,
-            type_name: type_name
-        })
-        //Tạo người dùng mới
-        const passwordHash = await bcrypt.hash(password, 12);
-        const newUser = new User({
-            _id: new mongoose.Types.ObjectId(),
-            name: name,
-            email: email,
-            phone: phone,
-            birthday: birthday,
-            password: passwordHash,
-            gender: gender,
-            avatar: newAttachment._id,
-            status: 0,// 0. còn dùng,1. bị khóa
-            status_name: "Active",
-            time_create: moment()
-        })
-        //Tạo token mới
-        const access_token = createAccessToken({ id: newUser._id });
-        const refresh_token = createRefreshToken({ id: newUser._id });
-        res.cookie("refreshtoken", refresh_token, {
-            httpOnly: true,
-            path: "/auth/refresh_token",
-            maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
-        });
+        if (avatar) {
+            //Tạo hình ảnh mới
+            const newAttachment = new Attachment({
+                _id: new mongoose.Types.ObjectId(),
+                name: avatar_name,
+                size: size,
+                format_type: format_type,
+                type: type,
+                type_name: type_name
+            })
+            //Tạo người dùng mới
+            const passwordHash = await bcrypt.hash(password, 12);
+            const newUser = new User({
+                _id: new mongoose.Types.ObjectId(),
+                name: name,
+                email: email,
+                phone: phone,
+                birthday: birthday,
+                password: passwordHash,
+                gender: gender,
+                avatar: newAttachment._id,
+                status: 0,// 0. còn dùng,1. bị khóa
+                status_name: "Active",
+                time_create: moment()
+            })
+            //Tạo token mới
+            const access_token = createAccessToken({ id: newUser._id });
+            const refresh_token = createRefreshToken({ id: newUser._id });
+            res.cookie("refreshtoken", refresh_token, {
+                httpOnly: true,
+                path: "/auth/refresh_token",
+                maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
+            });
 
-        await newUser.save();
-        await newAttachment.save();
-        //---------------------------------------------------
-        cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
-            await Attachment.findByIdAndUpdate(
-                { _id: newAttachment._id },
-                {
-                    link: result.url,
-                    user: newUser._id,
-                    res_model: "User",
-                    res_id: newUser._id
-                }
-            )
-        })
-        //---------------------------------------------------
-        res.json({
-            message: "Đăng kí thành công!",
-            access_token,
-            user: {
-                ...newUser._doc,
-                password: "",
-            },
-        });
+            await newUser.save();
+            await newAttachment.save();
+            //---------------------------------------------------
+            cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
+                await Attachment.findByIdAndUpdate(
+                    { _id: newAttachment._id },
+                    {
+                        link: result.url,
+                        user: newUser._id,
+                        res_model: "User",
+                        res_id: newUser._id
+                    }
+                )
+            })
+            //---------------------------------------------------
+            res.json({
+                message: "Đăng kí thành công!",
+                access_token,
+                user: {
+                    ...newUser._doc,
+                    password: "",
+                },
+            });
+        }
+        else {
+            const passwordHash = await bcrypt.hash(password, 12);
+
+            const newUser = new User({
+                name: name,
+                email: email,
+                phone: phone,
+                birthday: birthday,
+                password: passwordHash,
+                gender: gender,
+                avatar: avatar,
+                status: 0,// 0. còn dùng,1. bị khóa
+                status_name: "Active",
+                time_create: moment()
+            })
+            const access_token = createAccessToken({ id: newUser._id });
+            const refresh_token = createRefreshToken({ id: newUser._id });
+            res.cookie("refreshtoken", refresh_token, {
+                httpOnly: true,
+                path: "/auth/refresh_token",
+                maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
+            });
+            await newUser.save();
+            res.json({
+                message: "Đăng kí thành công!",
+                access_token,
+                user: {
+                    ...newUser._doc,
+                    password: "",
+                },
+            });
+        }
+
     }
     catch (error) {
         logging.error(NAMESPACE, error.message, error)

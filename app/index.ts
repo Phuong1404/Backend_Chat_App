@@ -10,6 +10,7 @@ import * as userRoutes from './routes/User.route'
 import * as requestRoutes from './routes/FriendRequest.route'
 import * as channelRoutes from './routes/Channel.route'
 import * as messageRoutes from './routes/Message.route'
+import * as notifyRoutes from './routes/Notification.route'
 import * as path from 'path'
 import * as cors from 'cors';
 import * as cloudinary from 'cloudinary'
@@ -80,6 +81,7 @@ app.use('/user', userRoutes)
 app.use('/request', requestRoutes)
 app.use('/channel', channelRoutes)
 app.use('/message', messageRoutes)
+app.use('/notify', notifyRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

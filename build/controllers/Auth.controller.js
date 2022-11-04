@@ -45,54 +45,85 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             return res.status(400).json({ message: "Mật khẩu phải ít nhất 6 kí tự." });
         }
         //Tạo hình ảnh mới
-        const newAttachment = new Attachment_model_1.default({
-            _id: new mongoose_1.default.Types.ObjectId(),
-            name: avatar_name,
-            size: size,
-            format_type: format_type,
-            type: type,
-            type_name: type_name
-        });
-        //Tạo người dùng mới
-        const passwordHash = yield bcrypt.hash(password, 12);
-        const newUser = new User_model_1.default({
-            _id: new mongoose_1.default.Types.ObjectId(),
-            name: name,
-            email: email,
-            phone: phone,
-            birthday: birthday,
-            password: passwordHash,
-            gender: gender,
-            avatar: newAttachment._id,
-            status: 0,
-            status_name: "Active",
-            time_create: moment()
-        });
-        //Tạo token mới
-        const access_token = createAccessToken({ id: newUser._id });
-        const refresh_token = createRefreshToken({ id: newUser._id });
-        res.cookie("refreshtoken", refresh_token, {
-            httpOnly: true,
-            path: "/auth/refresh_token",
-            maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
-        });
-        yield newUser.save();
-        yield newAttachment.save();
-        //---------------------------------------------------
-        cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
-            yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
-                link: result.url,
-                user: newUser._id,
-                res_model: "User",
-                res_id: newUser._id
+        if (avatar) {
+            //Tạo hình ảnh mới
+            const newAttachment = new Attachment_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId(),
+                name: avatar_name,
+                size: size,
+                format_type: format_type,
+                type: type,
+                type_name: type_name
             });
-        }));
-        //---------------------------------------------------
-        res.json({
-            message: "Đăng kí thành công!",
-            access_token,
-            user: Object.assign(Object.assign({}, newUser._doc), { password: "" }),
-        });
+            //Tạo người dùng mới
+            const passwordHash = yield bcrypt.hash(password, 12);
+            const newUser = new User_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId(),
+                name: name,
+                email: email,
+                phone: phone,
+                birthday: birthday,
+                password: passwordHash,
+                gender: gender,
+                avatar: newAttachment._id,
+                status: 0,
+                status_name: "Active",
+                time_create: moment()
+            });
+            //Tạo token mới
+            const access_token = createAccessToken({ id: newUser._id });
+            const refresh_token = createRefreshToken({ id: newUser._id });
+            res.cookie("refreshtoken", refresh_token, {
+                httpOnly: true,
+                path: "/auth/refresh_token",
+                maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
+            });
+            yield newUser.save();
+            yield newAttachment.save();
+            //---------------------------------------------------
+            cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                    link: result.url,
+                    user: newUser._id,
+                    res_model: "User",
+                    res_id: newUser._id
+                });
+            }));
+            //---------------------------------------------------
+            res.json({
+                message: "Đăng kí thành công!",
+                access_token,
+                user: Object.assign(Object.assign({}, newUser._doc), { password: "" }),
+            });
+        }
+        else {
+            const passwordHash = yield bcrypt.hash(password, 12);
+            const newUser = new User_model_1.default({
+                name: name,
+                email: email,
+                phone: phone,
+                birthday: birthday,
+                password: passwordHash,
+                gender: gender,
+                avatar: avatar,
+                status: 0,
+                status_name: "Active",
+                time_create: moment()
+            });
+            const access_token = createAccessToken({ id: newUser._id });
+            const refresh_token = createRefreshToken({ id: newUser._id });
+            res.cookie("refreshtoken", refresh_token, {
+                httpOnly: true,
+                path: "/auth/refresh_token",
+                maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
+            });
+            yield newUser.save();
+            res.json({
+                message: "Đăng kí thành công!",
+                access_token,
+                user: Object.assign(Object.assign({}, newUser._doc), { password: "" }),
+            });
+        }
     }
     catch (error) {
         logging_1.default.error(NAMESPACE, error.message, error);

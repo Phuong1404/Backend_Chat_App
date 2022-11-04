@@ -30,7 +30,10 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" });
         }
-        const message = yield Message_model_1.default.find({ channel: String(channel_id) }).skip(skip).limit(limit);
+        const message = yield Message_model_1.default.find({ channel: String(channel_id) })
+            .populate("attachment")
+            .skip(skip)
+            .limit(limit);
         const List_Message = [];
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']));
@@ -62,6 +65,7 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
         const fileAttachment = req.file;
         let file_name, format_type, size = "";
         if (fileAttachment) {
+            console.log(fileAttachment);
             file_name = fileAttachment.filename;
             format_type = fileAttachment.mimetype;
             size = String(fileAttachment.size);
@@ -73,29 +77,45 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
             format_type: format_type,
         });
         //----------------------------------------------------
-        const newMessage = new Message_model_1.default({
-            _id: new mongoose_1.default.Types.ObjectId,
-            user: req.user['_id'],
-            status: 0,
-            status_name: "Active",
-            reply: reply,
-            channel: channel_id,
-            content: content,
-            attachment: newAttachment._id
-        });
-        newMessage.save();
-        yield newAttachment.save();
-        //---------------------------------------------------
-        cloudinary.v2.uploader.upload(fileAttachment.path, { resource_type: "raw" }).then((result) => __awaiter(void 0, void 0, void 0, function* () {
-            yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
-                link: result.url,
+        if (fileAttachment) {
+            const newMessage = new Message_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId,
                 user: req.user['_id'],
-                res_model: "Message",
-                res_id: newMessage._id
+                status: 0,
+                status_name: "Active",
+                reply: reply,
+                channel: channel_id,
+                content: content,
+                attachment: newAttachment._id
             });
-        }));
-        //---------------------------------------------------
-        res.json({ data: newMessage });
+            yield newMessage.save();
+            yield newAttachment.save();
+            //---------------------------------------------------
+            cloudinary.v2.uploader.upload(fileAttachment.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                    link: result.url,
+                    user: req.user['_id'],
+                    res_model: "Message",
+                    res_id: newMessage._id
+                });
+            }));
+            res.json({ data: newMessage });
+            //---------------------------------------------------
+        }
+        else {
+            const newMessage = new Message_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId,
+                user: req.user['_id'],
+                status: 0,
+                status_name: "Active",
+                reply: reply,
+                channel: channel_id,
+                content: content,
+                attachment: newAttachment._id
+            });
+            yield newMessage.save();
+            res.json({ data: newMessage });
+        }
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

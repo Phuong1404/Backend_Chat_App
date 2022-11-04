@@ -22,7 +22,10 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" })
         }
-        const message = await Message.find({ channel: String(channel_id) }).skip(skip).limit(limit)
+        const message = await Message.find({ channel: String(channel_id) })
+            .populate("attachment")
+            .skip(skip)
+            .limit(limit)
         const List_Message = []
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']))
@@ -54,10 +57,12 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
         const fileAttachment = req.file
         let file_name, format_type, size = ""
         if (fileAttachment) {
+            console.log(fileAttachment)
             file_name = fileAttachment.filename
             format_type = fileAttachment.mimetype
             size = String(fileAttachment.size)
         }
+
         const newAttachment = new Attachment({
             _id: new mongoose.Types.ObjectId(),
             name: file_name,
@@ -65,33 +70,50 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
             format_type: format_type,
         })
         //----------------------------------------------------
-        const newMessage = new Message({
-            _id: new mongoose.Types.ObjectId,
-            user: req.user['_id'],
-            status: 0,
-            status_name: "Active",
-            reply: reply,
-            channel: channel_id,
-            content: content,
-            attachment: newAttachment._id
-        })
-        newMessage.save()
-        await newAttachment.save();
-        //---------------------------------------------------
-        cloudinary.v2.uploader.upload(fileAttachment.path, { resource_type: "raw" }).then(async (result) => {
-            await Attachment.findByIdAndUpdate(
-                { _id: newAttachment._id },
-                {
-                    link: result.url,
-                    user: req.user['_id'],
-                    res_model: "Message",
-                    res_id: newMessage._id
-                }
-            )
-        })
-        //---------------------------------------------------
 
-        res.json({ data: newMessage })
+        if (fileAttachment) {
+            const newMessage = new Message({
+                _id: new mongoose.Types.ObjectId,
+                user: req.user['_id'],
+                status: 0,
+                status_name: "Active",
+                reply: reply,
+                channel: channel_id,
+                content: content,
+                attachment: newAttachment._id
+            })
+            await newMessage.save()
+            await newAttachment.save();
+
+            //---------------------------------------------------
+            cloudinary.v2.uploader.upload(fileAttachment.path).then(async (result) => {
+                await Attachment.findByIdAndUpdate(
+                    { _id: newAttachment._id },
+                    {
+                        link: result.url,
+                        user: req.user['_id'],
+                        res_model: "Message",
+                        res_id: newMessage._id
+                    }
+                )
+            })
+            res.json({ data: newMessage })
+            //---------------------------------------------------
+        }
+        else {
+            const newMessage = new Message({
+                _id: new mongoose.Types.ObjectId,
+                user: req.user['_id'],
+                status: 0,
+                status_name: "Active",
+                reply: reply,
+                channel: channel_id,
+                content: content,
+                attachment: newAttachment._id
+            })
+            await newMessage.save()
+            res.json({ data: newMessage })
+        }
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

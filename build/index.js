@@ -12,6 +12,7 @@ const userRoutes = require("./routes/User.route");
 const requestRoutes = require("./routes/FriendRequest.route");
 const channelRoutes = require("./routes/Channel.route");
 const messageRoutes = require("./routes/Message.route");
+const notifyRoutes = require("./routes/Notification.route");
 const cors = require("cors");
 const cloudinary = require("cloudinary");
 //------------------------------------
@@ -73,6 +74,7 @@ app.use('/user', userRoutes);
 app.use('/request', requestRoutes);
 app.use('/channel', channelRoutes);
 app.use('/message', messageRoutes);
+app.use('/notify', notifyRoutes);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');
