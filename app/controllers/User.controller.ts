@@ -47,42 +47,57 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
             format_type = avatar.mimetype
             type_name = "Image"
             size = String(avatar.size)
-        }
-        //Tạo hình ảnh mới
-        const newAttachment = new Attachment({
-            _id: new mongoose.Types.ObjectId(),
-            name: avatar_name,
-            size: size,
-            format_type: format_type,
-            type: type,
-            type_name: type_name
-        })
-        await User.findOneAndUpdate(
-            { _id: req.user['_id'] },
-            {
-                name,
-                birthday,
-                gender,
-                avatar: newAttachment._id,
-                address,
-                job
-            }
-        );
-        await newAttachment.save();
-        //---------------------------------------------------
-        cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
-            await Attachment.findByIdAndUpdate(
-                { _id: newAttachment._id },
+
+            //Tạo hình ảnh mới
+            const newAttachment = new Attachment({
+                _id: new mongoose.Types.ObjectId(),
+                name: avatar_name,
+                size: size,
+                format_type: format_type,
+                type: type,
+                type_name: type_name
+            })
+            await User.findOneAndUpdate(
+                { _id: req.user['_id'] },
                 {
-                    link: result.url,
-                    user: req.user['_id'],
-                    res_model: "User",
-                    res_id: req.user['_id']
+                    name,
+                    birthday,
+                    gender,
+                    avatar: newAttachment._id,
+                    address,
+                    job
                 }
-            )
-        })
-        //---------------------------------------------------
-        res.json({ message: "Update success!" });
+            );
+            await newAttachment.save();
+            //---------------------------------------------------
+            cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
+                await Attachment.findByIdAndUpdate(
+                    { _id: newAttachment._id },
+                    {
+                        link: result.url,
+                        user: req.user['_id'],
+                        res_model: "User",
+                        res_id: req.user['_id']
+                    }
+                )
+            })
+            //---------------------------------------------------
+            res.json({ message: "Update success!" });
+
+        }
+        else {
+            await User.findOneAndUpdate(
+                { _id: req.user['_id'] },
+                {
+                    name,
+                    birthday,
+                    gender,
+                    address,
+                    job
+                }
+            );
+            res.json({ message: "Update success!" });
+        }
     }
     catch (error) {
         return res.status(500).json({ message: error.message })

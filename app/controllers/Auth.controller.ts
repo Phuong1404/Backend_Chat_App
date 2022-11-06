@@ -39,6 +39,7 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
         //Tạo hình ảnh mới
         if (avatar) {
             //Tạo hình ảnh mới
+            console.log(avatar)
             const newAttachment = new Attachment({
                 _id: new mongoose.Types.ObjectId(),
                 name: avatar_name,
@@ -73,8 +74,11 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
 
             await newUser.save();
             await newAttachment.save();
+            console.log(1)
+            console.log(avatar.path)
             //---------------------------------------------------
             cloudinary.v2.uploader.upload(avatar.path).then(async (result) => {
+                console.log(result)
                 await Attachment.findByIdAndUpdate(
                     { _id: newAttachment._id },
                     {
@@ -96,6 +100,7 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
             });
         }
         else {
+
             const passwordHash = await bcrypt.hash(password, 12);
 
             const newUser = new User({

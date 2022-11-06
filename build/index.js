@@ -13,6 +13,8 @@ const requestRoutes = require("./routes/FriendRequest.route");
 const channelRoutes = require("./routes/Channel.route");
 const messageRoutes = require("./routes/Message.route");
 const notifyRoutes = require("./routes/Notification.route");
+const postRoutes = require("./routes/Post.router");
+const commentRoutes = require("./routes/Comment.route");
 const cors = require("cors");
 const cloudinary = require("cloudinary");
 //------------------------------------
@@ -22,6 +24,9 @@ require('./models/FriendRequest.model');
 require('./models/Attachment.model');
 require('./models/Message.model');
 require('./models/Notification.model');
+require('./models/Post.model');
+require('./models/SavePost.model');
+require('./models/Comment.model');
 //------------------------------------
 const NAMESPACE = 'Server';
 const app = express();
@@ -75,6 +80,8 @@ app.use('/request', requestRoutes);
 app.use('/channel', channelRoutes);
 app.use('/message', messageRoutes);
 app.use('/notify', notifyRoutes);
+app.use('/post', postRoutes);
+app.use('/comment', commentRoutes);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

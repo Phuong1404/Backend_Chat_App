@@ -49,6 +49,17 @@ const SocketServer = (socket) => {
             })
         }
     })
+    //Notification
+    socket.on("createNotify", (msg) => {
+        const client = users.find((user) => msg.receiver.includes(user.id));
+        client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
+    });
+
+    socket.on("deleteNotify", (msg) => {
+        const client = users.find((user) => msg.receiver.includes(user.id));
+        client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
+    });
+
     //Message
     socket.on("addMessage", (msg) => {
         const user = users.find((user) => user.id === msg.recipient);

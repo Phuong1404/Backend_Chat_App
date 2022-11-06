@@ -9,6 +9,6 @@ export default interface IComment extends Document {
     time_update: Date;
     react: [Object];
     attachment: [Object];
-    post_id: string;
-    parent_comment: string;
+    post_id: Object;
+    parent_comment: Object;
 }
