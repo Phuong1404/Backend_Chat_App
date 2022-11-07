@@ -47,7 +47,6 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         //Tạo hình ảnh mới
         if (avatar) {
             //Tạo hình ảnh mới
-            console.log(avatar);
             const newAttachment = new Attachment_model_1.default({
                 _id: new mongoose_1.default.Types.ObjectId(),
                 name: avatar_name,
@@ -80,20 +79,20 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
                 maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
             });
             yield newUser.save();
-            yield newAttachment.save();
-            console.log(1);
-            console.log(avatar.path);
-            //---------------------------------------------------
-            cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
-                console.log(result);
-                yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
-                    link: result.url,
-                    user: newUser._id,
-                    res_model: "User",
-                    res_id: newUser._id
-                });
+            yield newAttachment.save().then(() => __awaiter(void 0, void 0, void 0, function* () {
+                //---------------------------------------------------
+                yield cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
+                        link: result.url,
+                        user: newUser._id,
+                        res_model: "User",
+                        res_id: newUser._id
+                    });
+                }));
+                //---------------------------------------------------
+            })).catch((err => {
+                res.status(500).json({ "message": err });
             }));
-            //---------------------------------------------------
             res.json({
                 message: "Đăng kí thành công!",
                 access_token,
@@ -176,7 +175,6 @@ const createRefreshToken = (payload) => {
 const GenerateAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const rf_token = req.cookies.refreshtoken;
-        console.log(rf_token);
         if (!rf_token)
             return res.status(400).json({ message: "Đăng nhập ngay." });
         jwt.verify(rf_token, config_1.default.server.token.secret, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
