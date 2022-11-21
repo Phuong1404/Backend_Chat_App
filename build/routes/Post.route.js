@@ -13,4 +13,4 @@ router.post('/savepost/:id', extractJWT_1.default, Post_controller_1.default.sav
 router.patch('/unsavepost/:id', extractJWT_1.default, Post_controller_1.default.unSavePost);
 router.get('/getsavepost', extractJWT_1.default, Post_controller_1.default.getSavePost);
 module.exports = router;
-//# sourceMappingURL=Post.router.js.map
+//# sourceMappingURL=Post.route.js.map

@@ -4,7 +4,7 @@ const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
 import uploadImage from '../Middleware/uploadImage'
 
-router.post('/', extractJWT, controller.createPost)
+router.post('/', extractJWT,uploadImage.array("files", 6), controller.createPost)
 router.get('/', extractJWT, controller.getPosts)
 router.patch('/:id', extractJWT, controller.updatePost)
 router.get('/:id', extractJWT, controller.getPost)

@@ -3,11 +3,11 @@ import User from '../models/User.model'
 import Attachment from '../models/Attachment.model'
 import mongoose, { model } from 'mongoose';
 import * as cloudinary from 'cloudinary'
-
-//1. Lấy thông tin người dùng
-const getUser = async (req: Request, res: Response, next: NextFunction) => {
+//0. Lấy thông tin bản thân
+const getMyUser=async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.user['_id'])
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.user['_id'])
             .select("-password")
             .populate("friend", "_id name avatar")
             .populate("channel", "_id name avatar num_member")
@@ -20,11 +20,28 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
+}
+//1. Lấy thông tin người dùng
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select("-password -channel -friend_request -status -status_name")
+            .populate("friend", "_id name avatar")
+            // .populate("channel", "_id name avatar num_member")
+            .populate("avatar", "-_id link")
+            // .populate("friend_request");
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist." });
+        }
+        res.json({ data: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 };
 //2. Tìm kiếm người dùng
 const searchUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let { data } = req.body
+        let { data } = req.query
         const user = await User.find({ $or: [{ name: { $regex: data } }, { 'phone': data }, { 'email': data }] })
             .limit(10)
             .select('_id name')
@@ -104,5 +121,5 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 export default {
-    getUser, searchUser, updateUser
+    getUser, searchUser, updateUser,getMyUser
 }

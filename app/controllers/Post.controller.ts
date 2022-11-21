@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose';
 import User from '../models/User.model'
 import Post from "../models/Post.model";
+import Comment from "../models/Comment.model";
 import Attachment from '../models/Attachment.model'
 import moment from "moment";
 import * as cloudinary from 'cloudinary'
@@ -32,11 +33,12 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 listAttachment.push(newAttachment)
                 attachmentId.push(newAttachment.id)
             }
-            const newPost = await new Post({
+            const newPost = new Post({
                 _id: new mongoose.Types.ObjectId(),
                 content: content,
                 attachment: attachmentId,
-                time: moment(),
+                user:req.user['_id'],
+                time: moment,
             })
 
             await newPost.save().then(async (result) => {
@@ -63,14 +65,17 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 logging.error(NAMESPACE, error.message, error)
                 return res.status(500).json({ message: error.message });
             })
+            res.json({message:'Success'})
         }
         else {
             const newPost = await new Post({
                 _id: new mongoose.Types.ObjectId(),
                 content: content,
-                time: moment(),
+                user:req.user['_id'],
+                time: moment,
             })
             await newPost.save()
+            res.json({message:'Success'})
         }
     }
     catch (err) {
@@ -80,7 +85,15 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
 //2. Lấy danh sách bài post
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const post = await Post.find({
+            user: [...req.user['friend'], req.user['_id']]
+        }).sort("-createdAt")
+            .populate("user", "name avatar")
 
+        res.json({
+            result: post.length,
+            post,
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -89,7 +102,6 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
 //3. Cập nhật bài post
 const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -100,7 +112,14 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
 //6. Lấy 1 bài post
 const getPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const post = await Post.findById(req.params.id)
+            .populate("user", "name avatar")
+        if (!post)
+            return res.status(400).json({ msg: "This post does not exits." });
 
+        res.json({
+            data: post,
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -110,7 +129,14 @@ const getPost = async (req: Request, res: Response, next: NextFunction) => {
 //8. Xóa bài post
 const deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const post = await Post.findOneAndDelete({
+            _id: req.params.id,
+        });
+        await Comment.deleteMany({ _id: { $in: post.comments } });
 
+        res.json({
+            message: "Deleted Post!"
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

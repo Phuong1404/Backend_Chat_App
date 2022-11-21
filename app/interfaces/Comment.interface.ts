@@ -4,6 +4,8 @@ export default interface IComment extends Document {
     time: Date;
     user: Object;
     status: number;
+    tag:Object;
+    reply:Object;
     status_name: string;
     time_create: Date;
     time_update: Date;

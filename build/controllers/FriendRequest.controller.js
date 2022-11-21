@@ -103,10 +103,10 @@ const AcceptRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         status_name: 'Accept'
     });
     yield User_model_1.default.findOneAndUpdate({ _id: request.sender }, {
-        $push: { friend: request.sender, channel: newChannel._id }
+        $push: { friend: request.recever, channel: newChannel._id }
     });
     yield User_model_1.default.findOneAndUpdate({ _id: request.recever }, {
-        $push: { friend: request.recever, channel: newChannel._id }
+        $push: { friend: request.sender, channel: newChannel._id }
     });
     res.json({ message: "Accept Success" });
 });

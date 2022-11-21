@@ -113,13 +113,13 @@ const AcceptRequest = async (req: Request, res: Response, next: NextFunction) =>
     await User.findOneAndUpdate(
         { _id: request.sender },
         {
-            $push: { friend: request.sender, channel: newChannel._id }
+            $push: { friend: request.recever, channel: newChannel._id }
         }
     );
     await User.findOneAndUpdate(
         { _id: request.recever },
         {
-            $push: { friend: request.recever, channel: newChannel._id }
+            $push: { friend: request.sender, channel: newChannel._id }
         }
     );
 

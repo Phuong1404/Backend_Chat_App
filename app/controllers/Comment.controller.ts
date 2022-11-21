@@ -1,11 +1,94 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose, { model } from 'mongoose';
 import Comment from "../models/Comment.model";
+import Attachment from "../models/Attachment.model";
+import Post from "../models/Post.model";
+import moment from "moment";
+import * as cloudinary from 'cloudinary'
+import logging from "../config/logging";
+const NAMESPACE = "COMMENT"
 
 //1. Tạo comment
 const createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { tag, parent_comment, content } = req.body
+        const post_id = req.params.id
+        const files = req.files
+        if (tag && content.length === 0 && !files) {
+            return res.status(400).json({ msg: "Please add content or image." });
+        }
+        if (files) {
+            let listAttachment = []
+            let attachmentId = []
+            for (let file in files) {
+                const newAttachment = new Attachment({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: files[file].filename,
+                    size: String(files[file].size),
+                    format_type: files[file].mimetype,
+                    type: 0,
+                    type_name: "Image"
+                })
+                listAttachment.push(newAttachment)
+                attachmentId.push(newAttachment.id)
+            }
+            const newComment = await new Comment({
+                _id: new mongoose.Types.ObjectId(),
+                content: content,
+                tag: tag,
+                parent_comment: parent_comment,
+                post_id: post_id,
+                user: req.user['_id'],
+                attachment: attachmentId,
+                time: moment,
+            })
 
+            await newComment.save().then(async (result) => {
+                if (result) {
+                    for (let item in listAttachment) {
+                        await listAttachment[item].save()
+
+                        //------------------------------------------------
+                        cloudinary.v2.uploader.upload(files[item].path).then(async (result) => {
+                            await Attachment.findByIdAndUpdate(
+                                { _id: listAttachment[item]._id },
+                                {
+                                    link: result.url,
+                                    user: req.user['_id'],
+                                    res_model: "Comment",
+                                    res_id: newComment._id
+                                }
+                            )
+                        })
+                        //------------------------------------------------
+                    }
+                }
+            }).catch((error) => {
+                logging.error(NAMESPACE, error.message, error)
+                return res.status(500).json({ message: error.message });
+            })
+            await Post.findByIdAndUpdate({ _id: post_id },
+                {
+                    $push: { comments: newComment._id }
+                })
+            res.json({message:'Success'})
+        }
+        else {
+            const newComment = await new Comment({
+                _id: new mongoose.Types.ObjectId(),
+                content: content,
+                tag: tag,
+                parent_comment: parent_comment,
+                post_id: post_id,
+                user: req.user['_id'],
+                time: moment,
+            })
+            await newComment.save()
+            await Post.findByIdAndUpdate({ _id: post_id },
+                {
+                    $push: { comments: newComment._id }
+                })
+        }
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -47,8 +130,42 @@ const deleteComment = async (req: Request, res: Response, next: NextFunction) =>
         return res.status(500).json({ message: err.message });
     }
 }
-
+//6. List comment
+const getComments = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const post_id = req.params.id
+        const comment = await Comment.find({
+            post_id: post_id
+        })
+            .populate("attachment")
+            .populate("user","_id name avatar")
+        res.json({
+            result: comment.length,
+            comment,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+//7. Comment
+const getComment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const comment_id = req.params.id
+        const comment = await Comment.find({
+            _id: comment_id
+        })
+            .populate("attachment")
+        res.json({
+            result: comment.length,
+            comment,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
 export default {
     createComment, updateComment, deleteComment,
-    likeComment, unlikeComment
+    likeComment, unlikeComment, getComments, getComment
 }

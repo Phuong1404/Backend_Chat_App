@@ -61,8 +61,17 @@ const SocketServer = (socket) => {
     });
 
     //Message
-    socket.on("addMessage", (msg) => {
-        const user = users.find((user) => user.id === msg.recipient);
-        user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
-    })
+    // socket.on("addMessage", (msg) => {
+    //     const user = users.find((user) => user.id === msg.recipient);
+    //     user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
+    // })
+
+    // //Send friend request
+    // socket.on("sendRequest", (msg) => {
+    //     const user = users.find((user) => user.id === msg.recipient);
+    //     user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
+    // })
+    //Accept friend request
 }
+
+export default SocketServer

@@ -11,11 +11,13 @@ import * as requestRoutes from './routes/FriendRequest.route'
 import * as channelRoutes from './routes/Channel.route'
 import * as messageRoutes from './routes/Message.route'
 import * as notifyRoutes from './routes/Notification.route'
-import * as postRoutes from './routes/Post.router'
+import * as postRoutes from './routes/Post.route'
 import * as commentRoutes from './routes/Comment.route'
 import * as path from 'path'
 import * as cors from 'cors';
 import * as cloudinary from 'cloudinary'
+import * as socketio from "socket.io"
+import  SocketServer from "./socketServer"
 //------------------------------------
 require('./models/Channel.model')
 require('./models/User.model')
@@ -37,7 +39,6 @@ cloudinary.v2.config({
     api_secret: 'Ukrcg0n1MGn9k4kMAH7jmmmIp00'
 });
 /** Connect to Mongo */
-console.log(config.mongo.url)
 mongoose
     .connect(config.mongo.url, config.mongo.options)
     .then((result) => {
@@ -49,6 +50,13 @@ mongoose
 
 /** Connect Socket*/
 const httpServer = http.createServer(app);
+let io = require("socket.io")(httpServer);
+
+
+io.on("connection", (socket) => {
+    console.log("Open connection")
+    SocketServer(socket);
+});
 
 /** Log the request */
 app.use((req, res, next) => {

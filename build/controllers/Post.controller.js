@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const Post_model_1 = require("../models/Post.model");
+const Comment_model_1 = require("../models/Comment.model");
 const Attachment_model_1 = require("../models/Attachment.model");
 const moment_1 = require("moment");
 const cloudinary = require("cloudinary");
@@ -40,11 +41,12 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 listAttachment.push(newAttachment);
                 attachmentId.push(newAttachment.id);
             }
-            const newPost = yield new Post_model_1.default({
+            const newPost = new Post_model_1.default({
                 _id: new mongoose_1.default.Types.ObjectId(),
                 content: content,
                 attachment: attachmentId,
-                time: (0, moment_1.default)(),
+                user: req.user['_id'],
+                time: moment_1.default,
             });
             yield newPost.save().then((result) => __awaiter(void 0, void 0, void 0, function* () {
                 if (result) {
@@ -66,14 +68,17 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 logging_1.default.error(NAMESPACE, error.message, error);
                 return res.status(500).json({ message: error.message });
             });
+            res.json({ message: 'Success' });
         }
         else {
             const newPost = yield new Post_model_1.default({
                 _id: new mongoose_1.default.Types.ObjectId(),
                 content: content,
-                time: (0, moment_1.default)(),
+                user: req.user['_id'],
+                time: moment_1.default,
             });
             yield newPost.save();
+            res.json({ message: 'Success' });
         }
     }
     catch (err) {
@@ -83,6 +88,14 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 //2. Lấy danh sách bài post
 const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const post = yield Post_model_1.default.find({
+            user: [...req.user['friend'], req.user['_id']]
+        }).sort("-createdAt")
+            .populate("user", "name avatar");
+        res.json({
+            result: post.length,
+            post,
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -101,6 +114,13 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 //6. Lấy 1 bài post
 const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const post = yield Post_model_1.default.findById(req.params.id)
+            .populate("user", "name avatar");
+        if (!post)
+            return res.status(400).json({ msg: "This post does not exits." });
+        res.json({
+            data: post,
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -110,6 +130,13 @@ const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
 //8. Xóa bài post
 const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const post = yield Post_model_1.default.findOneAndDelete({
+            _id: req.params.id,
+        });
+        yield Comment_model_1.default.deleteMany({ _id: { $in: post.comments } });
+        res.json({
+            message: "Deleted Post!"
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

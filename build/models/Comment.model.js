@@ -7,6 +7,7 @@ const CommentSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: "User"
     },
+    tag: Object,
     status: { type: Number },
     status_type: { type: String },
     react: [

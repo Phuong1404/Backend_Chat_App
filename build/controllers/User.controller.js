@@ -13,10 +13,11 @@ const User_model_1 = require("../models/User.model");
 const Attachment_model_1 = require("../models/Attachment.model");
 const mongoose_1 = require("mongoose");
 const cloudinary = require("cloudinary");
-//1. Lấy thông tin người dùng
-const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+//0. Lấy thông tin bản thân
+const getMyUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.user['_id']);
     try {
-        const user = yield User_model_1.default.findById(req.params.id)
+        const user = yield User_model_1.default.findById(req.user['_id'])
             .select("-password")
             .populate("friend", "_id name avatar")
             .populate("channel", "_id name avatar num_member")
@@ -31,10 +32,28 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(500).json({ message: error.message });
     }
 });
+//1. Lấy thông tin người dùng
+const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_model_1.default.findById(req.params.id)
+            .select("-password -channel -friend_request -status -status_name")
+            .populate("friend", "_id name avatar")
+            // .populate("channel", "_id name avatar num_member")
+            .populate("avatar", "-_id link");
+        // .populate("friend_request");
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist." });
+        }
+        res.json({ data: user });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
 //2. Tìm kiếm người dùng
 const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let { data } = req.body;
+        let { data } = req.query;
         const user = yield User_model_1.default.find({ $or: [{ name: { $regex: data } }, { 'phone': data }, { 'email': data }] })
             .limit(10)
             .select('_id name')
@@ -104,6 +123,6 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.default = {
-    getUser, searchUser, updateUser
+    getUser, searchUser, updateUser, getMyUser
 };
 //# sourceMappingURL=User.controller.js.map
