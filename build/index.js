@@ -48,7 +48,7 @@ mongoose_1.default
 });
 /** Connect Socket*/
 const httpServer = http.createServer(app);
-let io = require("socket.io")(httpServer);
+let io = require("socket.io")(httpServer, { cors: { origin: "*" } });
 io.on("connection", (socket) => {
     console.log("Open connection");
     (0, socketServer_1.default)(socket);

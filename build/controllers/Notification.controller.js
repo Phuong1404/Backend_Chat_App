@@ -12,11 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Notification_model_1 = require("../models/Notification.model");
 const createNotify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, receiver, url, text, content, image } = req.body;
+        const { receiver, url, text, content, image } = req.body;
         if (receiver.includes(req.user['_id'].toString()))
             return;
         const notify = yield new Notification_model_1.default({
-            id,
             receiver,
             url,
             text,

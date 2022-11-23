@@ -4,12 +4,11 @@ import Notification from "../models/Notification.model";
 
 const createNotify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { id, receiver, url, text, content, image } = req.body;
+        const { receiver, url, text, content, image } = req.body;
 
         if (receiver.includes(req.user['_id'].toString())) return;
 
         const notify = await new Notification({
-            id,
             receiver,
             url,
             text,
