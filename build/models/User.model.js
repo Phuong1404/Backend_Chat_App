@@ -11,6 +11,10 @@ const UserSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: "Attachment"
     },
+    cover_image: {
+        type: mongoose_1.default.Types.ObjectId,
+        ref: "Attachment"
+    },
     address: { type: String, maxlength: 300 },
     job: { type: String },
     password: { type: String },

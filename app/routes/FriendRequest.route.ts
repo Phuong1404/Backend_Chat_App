@@ -10,4 +10,6 @@ router.delete('/reject/:id', extractJWT, controller.RejectRequest)
 router.delete('/cancel/:id', extractJWT, controller.CancelRequest)
 
 router.patch('/accept/:id', extractJWT, controller.AcceptRequest)
+
+router.get('/list', extractJWT, controller.ListRequestRequest)
 export = router

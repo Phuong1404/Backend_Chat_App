@@ -7,5 +7,6 @@ import uploadImage from '../Middleware/uploadImage'
 router.get("/get/:id", controller.getUser)
 router.get("/search", extractJWT, controller.searchUser)
 router.patch("/update", extractJWT, uploadImage.single("avatar"), controller.updateUser)
+// router.patch("/update", extractJWT, uploadImage.array("images", 2), controller.updateUser)
 router.get("/getinfo",extractJWT,controller.getMyUser)
 export = router

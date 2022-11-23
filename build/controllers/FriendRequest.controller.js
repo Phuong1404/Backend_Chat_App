@@ -110,7 +110,22 @@ const AcceptRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     });
     res.json({ message: "Accept Success" });
 });
+//5. Lấy danh sách lời mời kết bạn
+const ListRequestRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const ListRequest = yield FriendRequest_model_1.default.find({ $or: [{ 'recever': req.user['_id'] }, { 'sender': req.user['_id'] }] })
+        .populate([
+        {
+            path: 'recever sender',
+            select: '_id name',
+            populate: {
+                path: 'avatar',
+                select: "link",
+            }
+        },
+    ]);
+    res.json(ListRequest);
+});
 exports.default = {
-    sendRequest, RejectRequest, CancelRequest, AcceptRequest
+    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest
 };
 //# sourceMappingURL=FriendRequest.controller.js.map

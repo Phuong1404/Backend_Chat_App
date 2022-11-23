@@ -125,6 +125,22 @@ const AcceptRequest = async (req: Request, res: Response, next: NextFunction) =>
 
     res.json({ message: "Accept Success" })
 }
+//5. Lấy danh sách lời mời kết bạn
+const ListRequestRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const ListRequest = await FriendRequest.find({ $or: [{ 'recever': req.user['_id'] }, { 'sender': req.user['_id'] }] })
+        .populate([
+            {
+              path: 'recever sender',
+              select: '_id name',
+              populate: {
+                path: 'avatar',
+                select:"link",
+              }
+            },
+          ])
+
+        res.json(ListRequest);
+}
 export default {
-    sendRequest, RejectRequest, CancelRequest, AcceptRequest
+    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest
 }
