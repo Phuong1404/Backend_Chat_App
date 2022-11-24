@@ -14,4 +14,6 @@ router.patch('/update/:id', extractJWT, controller.updateChannel)
 router.get('/:id', extractJWT, controller.getChannel)
 
 router.patch('/leave/:id', extractJWT, controller.leaveChannel)
+
+router.get('/get/mylist', extractJWT, controller.MyListChannel)
 export = router

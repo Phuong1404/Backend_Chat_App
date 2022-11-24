@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const Channel_model_1 = require("../models/Channel.model");
 const User_model_1 = require("../models/User.model");
+const Attachment_model_1 = require("../models/Attachment.model");
 //1. Create Channel
 const createChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { list_user, name } = req.body;
@@ -150,7 +151,83 @@ const leaveChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     });
     res.json({ message: "Leave channel success" });
 });
+//7. Get My List Channel
+const MyListChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const listChannel = yield Channel_model_1.default.find({ user: { $all: [req.user['_id']] } });
+    let ListValue = [];
+    for (let i in listChannel) {
+        if (listChannel[i].num_member == 2) {
+            const user_id = listChannel[i].user.find(user => String(user) != String(req.user['_id']));
+            const user_channel = yield User_model_1.default.findOne({ _id: user_id });
+            let avatar = "";
+            if (user_channel.avatar) {
+                const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
+                avatar = attachment.link;
+            }
+            let Listattachment = [];
+            for (let item in listChannel[i].attachment) {
+                const attachment = yield Attachment_model_1.default.findOne({ _id: listChannel[i].attachment[item] });
+                const val_att = {
+                    "_id": attachment._id,
+                    "name": attachment.name,
+                    "format_type": attachment.format_type,
+                    "link": attachment.link,
+                    "message_id": attachment.res_id
+                };
+                Listattachment.push(val_att);
+            }
+            const val = {
+                "_id": listChannel[i]._id,
+                "name": user_channel.name,
+                "avatar": avatar,
+                "num_member": listChannel[i].num_member,
+                "attachment": Listattachment
+            };
+            ListValue.push(val);
+        }
+        else {
+            let Listattachment = [];
+            for (let item in listChannel[i].attachment) {
+                const attachment = yield Attachment_model_1.default.findOne({ _id: listChannel[i].attachment[item] });
+                const val_att = {
+                    "_id": attachment._id,
+                    "name": attachment.name,
+                    "format_type": attachment.format_type,
+                    "link": attachment.link,
+                    "message_id": attachment.res_id
+                };
+                Listattachment.push(val_att);
+            }
+            listChannel[i].user.shift();
+            let List_User = [];
+            for (let u in listChannel[i].user) {
+                const user_channel = yield User_model_1.default.findOne({ _id: listChannel[i].user[u] });
+                let avatar = "";
+                if (user_channel.avatar) {
+                    const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
+                    avatar = attachment.link;
+                }
+                const val_user = {
+                    "_id": listChannel[i].user[u],
+                    "name": user_channel.name,
+                    "avatar": avatar
+                };
+                List_User.push(val_user);
+            }
+            const val = {
+                "_id": listChannel[i]._id,
+                "name": listChannel[i].name,
+                "avatar": "",
+                "user": List_User,
+                "num_member": listChannel[i].num_member,
+                "attachment": Listattachment
+            };
+            ListValue.push(val);
+        }
+    }
+    res.json(ListValue);
+});
 exports.default = {
-    leaveChannel, createChannel, updateChannel, addUserToChannel, removeUserToChannel, getChannel
+    leaveChannel, createChannel, updateChannel, addUserToChannel, removeUserToChannel, getChannel, MyListChannel
 };
 //# sourceMappingURL=Channel.controller.js.map

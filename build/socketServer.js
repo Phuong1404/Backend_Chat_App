@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let users = [];
-const EditData = (data, id, call) => {
-    const newData = data.map((item) => {
-        item.id === id ? Object.assign(Object.assign({}, item), { call }) : item;
-    });
-    return newData;
-};
+// const EditData = (data, id, call) => {
+//     const newData = data.map((item) => {
+//         item.id === id ? { ...item, call } : item
+//     });
+//     return newData;
+// }
 const SocketServer = (socket) => {
     //connect -- disconnect
     socket.on("userJoin", (user) => {

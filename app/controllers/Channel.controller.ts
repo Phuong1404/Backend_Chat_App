@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose, { model } from 'mongoose';
 import Channel from '../models/Channel.model'
 import User from '../models/User.model'
+import Attachment from "../models/Attachment.model";
 
 //1. Create Channel
 const createChannel = async (req: Request, res: Response, next: NextFunction) => {
@@ -141,6 +142,82 @@ const leaveChannel = async (req: Request, res: Response, next: NextFunction) => 
     })
     res.json({ message: "Leave channel success" })
 }
+//7. Get My List Channel
+const MyListChannel = async (req: Request, res: Response, next: NextFunction) => {
+    const listChannel = await Channel.find({ user: { $all: [req.user['_id']] } })
+    let ListValue = []
+    for (let i in listChannel) {
+        if (listChannel[i].num_member == 2) {
+            const user_id = listChannel[i].user.find(user => String(user) != String(req.user['_id']))
+            const user_channel = await User.findOne({ _id: user_id })
+            let avatar = ""
+            if (user_channel.avatar) {
+                const attachment = await Attachment.findOne({ _id: user_channel.avatar })
+                avatar = attachment.link
+            }
+            let Listattachment = []
+            for (let item in listChannel[i].attachment) {
+                const attachment = await Attachment.findOne({ _id: listChannel[i].attachment[item] })
+                const val_att = {
+                    "_id": attachment._id,
+                    "name": attachment.name,
+                    "format_type": attachment.format_type,
+                    "link": attachment.link,
+                    "message_id": attachment.res_id
+                }
+                Listattachment.push(val_att)
+            }
+            const val = {
+                "_id": listChannel[i]._id,
+                "name": user_channel.name,
+                "avatar": avatar,
+                "num_member": listChannel[i].num_member,
+                "attachment": Listattachment
+            }
+            ListValue.push(val)
+        }
+        else {
+            let Listattachment = []
+            for (let item in listChannel[i].attachment) {
+                const attachment = await Attachment.findOne({ _id: listChannel[i].attachment[item] })
+                const val_att = {
+                    "_id": attachment._id,
+                    "name": attachment.name,
+                    "format_type": attachment.format_type,
+                    "link": attachment.link,
+                    "message_id": attachment.res_id
+                }
+                Listattachment.push(val_att)
+            }
+            listChannel[i].user.shift()
+            let List_User = []
+            for (let u in listChannel[i].user) {
+                const user_channel = await User.findOne({ _id: listChannel[i].user[u] })
+                let avatar = ""
+                if (user_channel.avatar) {
+                    const attachment = await Attachment.findOne({ _id: user_channel.avatar })
+                    avatar = attachment.link
+                }
+                const val_user = {
+                    "_id": listChannel[i].user[u],
+                    "name": user_channel.name,
+                    "avatar": avatar
+                }
+                List_User.push(val_user)
+            }
+            const val = {
+                "_id": listChannel[i]._id,
+                "name": listChannel[i].name,
+                "avatar": "",
+                "user": List_User,
+                "num_member": listChannel[i].num_member,
+                "attachment": Listattachment
+            }
+            ListValue.push(val)
+        }
+    }
+    res.json(ListValue)
+}
 export default {
-    leaveChannel, createChannel, updateChannel, addUserToChannel, removeUserToChannel, getChannel
+    leaveChannel, createChannel, updateChannel, addUserToChannel, removeUserToChannel, getChannel, MyListChannel
 }
