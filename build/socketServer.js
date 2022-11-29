@@ -51,10 +51,10 @@ const SocketServer = (socket) => {
         client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
     });
     //Message
-    // socket.on("addMessage", (msg) => {
-    //     const user = users.find((user) => user.id === msg.recipient);
-    //     user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
-    // })
+    socket.on("addMessage", (msg) => {
+        const user = users.find((user) => user.id === msg.recipient);
+        user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
+    });
     // //Send friend request
     // socket.on("sendRequest", (msg) => {
     //     const user = users.find((user) => user.id === msg.recipient);

@@ -180,6 +180,11 @@ const MyListChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 "_id": listChannel[i]._id,
                 "name": user_channel.name,
                 "avatar": avatar,
+                "user": [{
+                        "_id": listChannel[i]._id,
+                        "name": user_channel.name,
+                        "avatar": avatar
+                    }],
                 "num_member": listChannel[i].num_member,
                 "attachment": Listattachment
             };

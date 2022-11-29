@@ -171,6 +171,11 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                 "_id": listChannel[i]._id,
                 "name": user_channel.name,
                 "avatar": avatar,
+                "user": [{
+                    "_id": listChannel[i]._id,
+                    "name": user_channel.name,
+                    "avatar": avatar
+                }],
                 "num_member": listChannel[i].num_member,
                 "attachment": Listattachment
             }
