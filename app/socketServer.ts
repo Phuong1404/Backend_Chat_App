@@ -30,9 +30,15 @@ const SocketServer = (socket, io) => {
         callback();
     })
     //Message
-    socket.on("sendMessage", (message, callback) => {
-        const user = chatsocket.getUser(socket.id)
+    socket.on("sendMessage", (message,room, callback) => {
+        const user = chatsocket.getUser(socket.id,room)
         io.to(user.room).emit('message', { user: user.user_id, message: message })
+        callback()
+    })
+    //Leave chat
+    socket.on('leaveChat',(room,callback)=>{
+        const user = chatsocket.getUser(socket.id,room)
+        socket.leave(user.room)
         callback()
     })
 
