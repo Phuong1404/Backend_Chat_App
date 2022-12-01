@@ -9,5 +9,6 @@ router.get("/search", extractJWT_1.default, User_controller_1.default.searchUser
 router.patch("/update", extractJWT_1.default, uploadImage_1.default.single("avatar"), User_controller_1.default.updateUser);
 // router.patch("/update", extractJWT, uploadImage.array("images", 2), controller.updateUser)
 router.get("/getinfo", extractJWT_1.default, User_controller_1.default.getMyUser);
+router.get("/getfiend", extractJWT_1.default, User_controller_1.default.listFriend);
 module.exports = router;
 //# sourceMappingURL=User.route.js.map

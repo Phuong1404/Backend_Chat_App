@@ -4,7 +4,7 @@ import Attachment from '../models/Attachment.model'
 import mongoose, { model } from 'mongoose';
 import * as cloudinary from 'cloudinary'
 //0. Lấy thông tin bản thân
-const getMyUser=async (req: Request, res: Response, next: NextFunction) => {
+const getMyUser = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.user['_id'])
     try {
         const user = await User.findById(req.user['_id'])
@@ -29,7 +29,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
             .populate("friend", "_id name avatar")
             // .populate("channel", "_id name avatar num_member")
             .populate("avatar", "-_id link")
-            // .populate("friend_request");
+        // .populate("friend_request");
         if (!user) {
             return res.status(400).json({ message: "User does not exist." });
         }
@@ -120,6 +120,17 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({ message: error.message })
     }
 }
+//4. Danh sách bạn bè
+const listFriend = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.user['_id'])
+            .populate("friend")
+        res.json(user)
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
 export default {
-    getUser, searchUser, updateUser,getMyUser
+    getUser, searchUser, updateUser, getMyUser, listFriend
 }

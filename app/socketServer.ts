@@ -1,3 +1,5 @@
+import chatsocket from './socket/chat.socket'
+import User from './models/User.model'
 let users = [];
 
 // const EditData = (data, id, call) => {
@@ -7,7 +9,7 @@ let users = [];
 //     return newData;
 // }
 
-const SocketServer = (socket) => {
+const SocketServer = (socket, io) => {
     //connect -- disconnect
     socket.on("userJoin", (user) => {
         users.push({
@@ -16,6 +18,25 @@ const SocketServer = (socket) => {
             friend: user.friend
         })
     })
+
+    //Chat socket
+    socket.on('joinchat', ({ user_id, room }, callback) => {
+        const { error, user } = chatsocket.addUser({ id: socket.id, user_id, room })
+
+        if (error) {
+            return callback(error);
+        }
+        socket.join(user.room)
+        callback();
+    })
+    //Message
+    socket.on("sendMessage", (message, callback) => {
+        const user = chatsocket.getUser(socket.id)
+        io.to(user.room).emit('message', { user: user.user_id, message: message })
+        callback()
+    })
+
+
     socket.on("disconnect", () => {
         const data = users.find((user) => user.socketId === socket.id);
         if (data) {
@@ -60,11 +81,7 @@ const SocketServer = (socket) => {
         client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
     });
 
-    //Message
-    socket.on("addMessage", (msg) => {
-        const user = users.find((user) => user.id === msg.recipient);
-        user && socket.to(`${user.socketId}`).emit("addMessageToClient", msg);
-    })
+
 
     // //Send friend request
     // socket.on("sendRequest", (msg) => {

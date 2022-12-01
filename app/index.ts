@@ -55,7 +55,7 @@ let io = require("socket.io")(httpServer,{cors:{origin:"*"}});
 
 io.on("connection", (socket) => {
     console.log("Open connection")
-    SocketServer(socket);
+    SocketServer(socket,io);
 });
 
 /** Log the request */

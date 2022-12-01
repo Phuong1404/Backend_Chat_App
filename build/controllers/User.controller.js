@@ -122,7 +122,18 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: error.message });
     }
 });
+//4. Danh sách bạn bè
+const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_model_1.default.findById(req.user['_id'])
+            .populate("friend");
+        res.json(user);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
 exports.default = {
-    getUser, searchUser, updateUser, getMyUser
+    getUser, searchUser, updateUser, getMyUser, listFriend
 };
 //# sourceMappingURL=User.controller.js.map

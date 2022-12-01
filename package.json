@@ -4,12 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage",
-    "test:watch": "jest --watch",
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc",
     "dev": "nodemon --exec ts-node ./app/index.ts",
-    "start": "node build/index.js",
+    "start": "nodemon -e ts  --exec build/index.js",
     "prod": "nodemon -e ts  --exec \"npm run build && npm run start\""
   },
   "author": "",
