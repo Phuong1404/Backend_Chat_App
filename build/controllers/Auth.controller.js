@@ -164,7 +164,7 @@ const Login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const createAccessToken = (payload) => {
     return jwt.sign(payload, config_1.default.server.token.secret, {
-        expiresIn: "1d",
+        expiresIn: "7d",
     });
 };
 const createRefreshToken = (payload) => {

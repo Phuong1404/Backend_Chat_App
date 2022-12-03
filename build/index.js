@@ -51,7 +51,7 @@ const httpServer = http.createServer(app);
 let io = require("socket.io")(httpServer, { cors: { origin: "*" } });
 io.on("connection", (socket) => {
     console.log("Open connection");
-    (0, socketServer_1.default)(socket);
+    (0, socketServer_1.default)(socket, io);
 });
 /** Log the request */
 app.use((req, res, next) => {

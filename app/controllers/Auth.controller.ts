@@ -174,7 +174,7 @@ const Login = async (req: Request, res: Response, next: NextFunction) => {
 }
 const createAccessToken = (payload) => {
     return jwt.sign(payload, config.server.token.secret, {
-        expiresIn: "1d",
+        expiresIn: "7d",
     });
 };
 const createRefreshToken = (payload) => {
