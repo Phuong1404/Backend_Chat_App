@@ -18,25 +18,19 @@ const SocketServer = (socket, io) => {
         });
     });
     //Chat socket
-    socket.on('joinchat', ({ user_id, room }, callback) => {
+    socket.on('joinchat', ({ user_id, room }) => {
         const { error, user } = chat_socket_1.default.addUser({ id: socket.id, user_id, room });
-        if (error) {
-            return callback(error);
-        }
         socket.join(user.room);
-        callback();
     });
     //Message
-    socket.on("sendMessage", (message, room, callback) => {
+    socket.on("sendMessage", (message, room) => {
         const user = chat_socket_1.default.getUser(socket.id, room);
         io.to(user.room).emit('message', { user: user.user_id, message: message });
-        callback();
     });
     //Leave chat
-    socket.on('leaveChat', (room, callback) => {
+    socket.on('leaveChat', (room) => {
         const user = chat_socket_1.default.getUser(socket.id, room);
         socket.leave(user.room);
-        callback();
     });
     socket.on("disconnect", () => {
         const data = users.find((user) => user.socketId === socket.id);

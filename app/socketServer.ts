@@ -20,26 +20,19 @@ const SocketServer = (socket, io) => {
     })
 
     //Chat socket
-    socket.on('joinchat', ({ user_id, room }, callback) => {
+    socket.on('joinchat', ({ user_id, room }) => {
         const { error, user } = chatsocket.addUser({ id: socket.id, user_id, room })
-
-        if (error) {
-            return callback(error);
-        }
         socket.join(user.room)
-        callback();
     })
     //Message
-    socket.on("sendMessage", (message, room, callback) => {
+    socket.on("sendMessage", (message, room) => {
         const user = chatsocket.getUser(socket.id, room)
         io.to(user.room).emit('message', { user: user.user_id, message: message })
-        callback()
     })
     //Leave chat
-    socket.on('leaveChat', (room, callback) => {
+    socket.on('leaveChat', (room) => {
         const user = chatsocket.getUser(socket.id, room)
         socket.leave(user.room)
-        callback()
     })
 
 
