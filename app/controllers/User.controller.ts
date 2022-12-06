@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import User from '../models/User.model'
 import Attachment from '../models/Attachment.model'
+import Channel from "../models/Channel.model";
 import mongoose, { model } from 'mongoose';
 import * as cloudinary from 'cloudinary'
 //0. Lấy thông tin bản thân
@@ -22,8 +23,11 @@ const getMyUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 //1. Lấy thông tin người dùng
-const getUser = async (req: Request, res: Response, next: NextFunction) => {
+const getUserPublic = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        if (req.user) {
+            console.log(req.user)
+        }
         const user = await User.findById(req.params.id)
             .select("-password -channel -friend_request -status -status_name")
             .populate("friend", "_id name avatar")
@@ -34,6 +38,31 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(400).json({ message: "User does not exist." });
         }
         res.json({ data: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select("-password -channel -friend_request -status -status_name")
+            .populate("friend", "_id name avatar")
+            // .populate("channel", "_id name avatar num_member")
+            .populate("avatar", "-_id link")
+        // .populate("friend_request");
+        let is_friend = false
+        const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { num_member: 2 }] })
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist." });
+        }
+        if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
+            is_friend = true
+        }
+        let chan = ""
+        if (channel) {
+            chan = channel._id
+        }
+        res.json({ data: user, channel: chan, is_friend: is_friend });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -132,5 +161,5 @@ const listFriend = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 export default {
-    getUser, searchUser, updateUser, getMyUser, listFriend
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic
 }

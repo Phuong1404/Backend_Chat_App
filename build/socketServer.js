@@ -64,14 +64,22 @@ const SocketServer = (socket, io) => {
         }
     });
     //Notification
-    socket.on("createNotify", (msg) => {
-        const client = users.find((user) => msg.receiver.includes(user.id));
-        client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
+    socket.on("createNotify", (user_id, notify) => {
+        const user_receiver = users.find((user) => user_id.includes(user.id));
+        user_receiver && socket.to(`${user_id}`).emit("createNotifyToClient", notify);
     });
-    socket.on("deleteNotify", (msg) => {
-        const client = users.find((user) => msg.receiver.includes(user.id));
-        client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
+    socket.on("deleteNotify", (user_id, notify) => {
+        const user_receiver = users.find((user) => user_id.includes(user.id));
+        user_receiver && socket.to(`${user_id}`).emit("deleteNotifyToClient", notify);
     });
+    // socket.on("createNotify", (msg) => {
+    //     const client = users.find((user) => msg.receiver.includes(user.id));
+    //     client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
+    // });
+    // socket.on("deleteNotify", (msg) => {
+    //     const client = users.find((user) => msg.receiver.includes(user.id));
+    //     client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
+    // });
     // //Send friend request
     // socket.on("sendRequest", (msg) => {
     //     const user = users.find((user) => user.id === msg.recipient);

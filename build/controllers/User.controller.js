@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = require("../models/User.model");
 const Attachment_model_1 = require("../models/Attachment.model");
+const Channel_model_1 = require("../models/Channel.model");
 const mongoose_1 = require("mongoose");
 const cloudinary = require("cloudinary");
 //0. Lấy thông tin bản thân
@@ -33,8 +34,11 @@ const getMyUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 //1. Lấy thông tin người dùng
-const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserPublic = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (req.user) {
+            console.log(req.user);
+        }
         const user = yield User_model_1.default.findById(req.params.id)
             .select("-password -channel -friend_request -status -status_name")
             .populate("friend", "_id name avatar")
@@ -45,6 +49,32 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(400).json({ message: "User does not exist." });
         }
         res.json({ data: user });
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
+const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_model_1.default.findById(req.params.id)
+            .select("-password -channel -friend_request -status -status_name")
+            .populate("friend", "_id name avatar")
+            // .populate("channel", "_id name avatar num_member")
+            .populate("avatar", "-_id link");
+        // .populate("friend_request");
+        let is_friend = false;
+        const channel = yield Channel_model_1.default.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { num_member: 2 }] });
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist." });
+        }
+        if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
+            is_friend = true;
+        }
+        let chan = "";
+        if (channel) {
+            chan = channel._id;
+        }
+        res.json({ data: user, channel: chan, is_friend: is_friend });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
@@ -134,6 +164,6 @@ const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.default = {
-    getUser, searchUser, updateUser, getMyUser, listFriend
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic
 };
 //# sourceMappingURL=User.controller.js.map

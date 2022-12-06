@@ -30,14 +30,14 @@ const SocketServer = (socket, io) => {
         callback();
     })
     //Message
-    socket.on("sendMessage", (message,room, callback) => {
-        const user = chatsocket.getUser(socket.id,room)
+    socket.on("sendMessage", (message, room, callback) => {
+        const user = chatsocket.getUser(socket.id, room)
         io.to(user.room).emit('message', { user: user.user_id, message: message })
         callback()
     })
     //Leave chat
-    socket.on('leaveChat',(room,callback)=>{
-        const user = chatsocket.getUser(socket.id,room)
+    socket.on('leaveChat', (room, callback) => {
+        const user = chatsocket.getUser(socket.id, room)
         socket.leave(user.room)
         callback()
     })
@@ -77,15 +77,23 @@ const SocketServer = (socket, io) => {
         }
     })
     //Notification
-    socket.on("createNotify", (msg) => {
-        const client = users.find((user) => msg.receiver.includes(user.id));
-        client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
-    });
+    socket.on("createNotify", (user_id, notify) => {
+        const user_receiver = users.find((user) => user_id.includes(user.id));
+        user_receiver && socket.to(`${user_id}`).emit("createNotifyToClient", notify);
+    })
+    socket.on("deleteNotify", (user_id, notify) => {
+        const user_receiver = users.find((user) => user_id.includes(user.id));
+        user_receiver && socket.to(`${user_id}`).emit("deleteNotifyToClient", notify);
+    })
+    // socket.on("createNotify", (msg) => {
+    //     const client = users.find((user) => msg.receiver.includes(user.id));
+    //     client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
+    // });
 
-    socket.on("deleteNotify", (msg) => {
-        const client = users.find((user) => msg.receiver.includes(user.id));
-        client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
-    });
+    // socket.on("deleteNotify", (msg) => {
+    //     const client = users.find((user) => msg.receiver.includes(user.id));
+    //     client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
+    // });
 
 
 
