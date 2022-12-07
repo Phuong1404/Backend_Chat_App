@@ -12,5 +12,5 @@ export default interface IMessage extends Document {
     foward:string;//trả lời với tin nhắn
     attachment:[Object];//tệp đính kèm
     channel_id:string;//kênh chat
-
+    unread:[Object]
 }

@@ -52,6 +52,9 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" })
         }
+        const is_user = channel.user.findIndex(user => String(user) == String(req.user['_id']))
+        console.log(channel.user)
+        let unread = channel.user.splice(is_user, 1)
         //-----------Setup_file------------------------------
         //Cần định dạng lại file
         const fileAttachment = req.file
@@ -80,7 +83,8 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
                 reply: reply,
                 channel: channel_id,
                 content: content,
-                attachment: newAttachment._id
+                attachment: newAttachment._id,
+                unread: unread
             })
             await newMessage.save()
             await newAttachment.save();
@@ -109,7 +113,8 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
                 reply: reply,
                 channel: channel_id,
                 content: content,
-                attachment: newAttachment._id
+                attachment: newAttachment._id,
+                unread: unread
             })
             await newMessage.save()
             res.json({ data: newMessage })
@@ -183,6 +188,30 @@ const reactMessage = async (req: Request, res: Response, next: NextFunction) => 
     })
     return res.json({ message: "React succsess" })
 }
+//6. Read message in channel
+const readMessage = async (req: Request, res: Response, next: NextFunction) => {
+    const channel_id = req.params.id
+    const channel = await Channel.findById(channel_id)
+    if (!channel) {
+        return res.status(400).json({ message: "Channel not found" })
+    }
+    const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']))
+    if (!is_MyChannel) {
+        res.status(400).json({ message: "This not your channel" })
+    }
+    const messages = await Message.find({ channel: String(channel_id) })
+
+    for (let mess in messages) {
+        let is_unread = messages[mess].unread.find(user => String(user) == String(req.user['_id']))
+        if (is_unread) {
+            await Message.findByIdAndUpdate({ _id: req.user['_id'] },
+                {
+                    $pull: { unread: req.user['_id'] }
+                })
+        }
+    }
+    res.json({ message: "Done" })
+}
 export default {
-    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel, reactMessage
+    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel, reactMessage,readMessage
 }

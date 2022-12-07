@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>SOCKET</title>
+</head>
+
+<body>
+    <script type="module">
+        import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+
+        const socket = io('http://localhost:8088');
+        socket.emit("userJoin", { _id:"2",friend:[1] });
+        socket.emit("joinchat",{ user_id:"2", room:"Phuong" })
+        socket.on("message", ({ user, message }) => {
+            console.log(message)
+        })
+        socket.emit("leaveChat",{room:"phuong"})
+    </script>
+</body>
+
+</html>

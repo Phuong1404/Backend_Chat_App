@@ -13,13 +13,19 @@ const addUser = ({ id, user_id, room }) => {
     return { user };
 };
 const removeUser = (id, room) => {
+    room = room.trim().toLowerCase();
     const index = users1.findIndex((user) => user.id == id && user.room === room);
     if (index !== -1) {
         return users1.splice(index, 1)[0];
     }
 };
 const getUser = (id, room) => {
-    return users1.find((user) => user.id === id && user.room === room);
+    room = room.trim().toLowerCase();
+    const user = users1.find((user) => user.id === id && user.room === room);
+    if (user) {
+        return user;
+    }
+    return { error: 'User not found' };
 };
 const getusers1InRoom = (room) => {
     return users1.filter((user) => user.room === room);

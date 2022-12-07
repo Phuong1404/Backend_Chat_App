@@ -153,8 +153,25 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 const listFriend = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await User.findById(req.user['_id'])
-            .populate("friend")
-        res.json(user)
+        const list_friend = user.friend
+        let FriendList = []
+        for (let friend in list_friend) {
+            let friend1 = await User.findById(list_friend[friend])
+            let avatar = ""
+            if (friend1.avatar) {
+                const attachment = await Attachment.findOne({ _id: friend1.avatar })
+                avatar = attachment.link
+            }
+            const val = {
+                "_id": friend1._id,
+                "name": friend1.name,
+                "avatar": avatar,
+                "gender": friend1.gender,
+                "friend": friend1.friend
+            }
+            FriendList.push(val)
+        }
+        res.json(FriendList)
     }
     catch (error) {
         return res.status(500).json({ message: error.message })

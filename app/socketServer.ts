@@ -1,5 +1,6 @@
 import chatsocket from './socket/chat.socket'
 import User from './models/User.model'
+import Channel from './models/Channel.model'
 let users = [];
 
 // const EditData = (data, id, call) => {
@@ -17,24 +18,43 @@ const SocketServer = (socket, io) => {
             socketId: socket.id,
             friend: user.friend
         })
+        console.log(`User ${user._id} was connect socket`)
     })
 
     //Chat socket
-    socket.on('joinchat', ({ user_id, room }) => {
-        const { error, user } = chatsocket.addUser({ id: socket.id, user_id, room })
-        socket.join(user.room)
+    socket.on('joinchat', async ({ user_id, room }) => {
+        const { error, user } = await chatsocket.addUser({ id: socket.id, user_id, room })
+        if (!error) {
+            await socket.join(user.room)
+            console.log(`User ${user_id} join room ${user.room}`)
+        }
     })
     //Message
-    socket.on("sendMessage", (message, room) => {
+    socket.on("sendMessage", async ({ message, room }) => {
         const user = chatsocket.getUser(socket.id, room)
-        io.to(user.room).emit('message', { user: user.user_id, message: message })
+        if (!user.error) {
+            let channel_user = await Channel.findOne({ id: room })['user']
+            io.to(user.room).emit('message', { user: user.user_id, message: message })
+            for (let u in channel_user) {
+                const us = users.find((user) => user.id === channel_user[u])
+                if (us) {
+                    socket.to(`${us.socketId}`).emit("channel message");
+                }
+            }
+            console.log("send success")
+        }
+        console.log("send fail")
     })
     //Leave chat
-    socket.on('leaveChat', (room) => {
+    socket.on('leaveChat', ({ room }) => {
         const user = chatsocket.getUser(socket.id, room)
         socket.leave(user.room)
+        console.log(`User ${user.user_id} was leave room ${user.room}`)
     })
-
+    //Đang nhập
+    socket.on('typing_to_server', function (sender, typing_status) {
+        io.emit('typing_to_client', sender, typing_status);
+    });
 
     socket.on("disconnect", () => {
         const data = users.find((user) => user.socketId === socket.id);
@@ -69,6 +89,8 @@ const SocketServer = (socket, io) => {
             })
         }
     })
+    //Notifi tin nhắn
+
     //Notification
     socket.on("createNotify", (user_id, notify) => {
         const user_receiver = users.find((user) => user_id.includes(user.id));

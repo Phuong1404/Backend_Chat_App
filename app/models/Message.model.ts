@@ -37,7 +37,11 @@ const MessageSchema: Schema = new Schema(
         channel: {
             type: mongoose.Types.ObjectId,
             ref: "Channel"
-        }
+        },
+        unread: [{
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        }],
     },
     {
         timestamps: true,

@@ -155,9 +155,26 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 //4. Danh sách bạn bè
 const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User_model_1.default.findById(req.user['_id'])
-            .populate("friend");
-        res.json(user);
+        const user = yield User_model_1.default.findById(req.user['_id']);
+        const list_friend = user.friend;
+        let FriendList = [];
+        for (let friend in list_friend) {
+            let friend1 = yield User_model_1.default.findById(list_friend[friend]);
+            let avatar = "";
+            if (friend1.avatar) {
+                const attachment = yield Attachment_model_1.default.findOne({ _id: friend1.avatar });
+                avatar = attachment.link;
+            }
+            const val = {
+                "_id": friend1._id,
+                "name": friend1.name,
+                "avatar": avatar,
+                "gender": friend1.gender,
+                "friend": friend1.friend
+            };
+            FriendList.push(val);
+        }
+        res.json(FriendList);
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

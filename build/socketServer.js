@@ -1,7 +1,16 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const chat_socket_1 = require("./socket/chat.socket");
-let users = [];
+[];
 // const EditData = (data, id, call) => {
 //     const newData = data.map((item) => {
 //         item.id === id ? { ...item, call } : item
@@ -16,21 +25,34 @@ const SocketServer = (socket, io) => {
             socketId: socket.id,
             friend: user.friend
         });
+        console.log(`User ${user._id} was connect socket`);
     });
     //Chat socket
-    socket.on('joinchat', ({ user_id, room }) => {
-        const { error, user } = chat_socket_1.default.addUser({ id: socket.id, user_id, room });
-        socket.join(user.room);
-    });
+    socket.on('joinchat', ({ user_id, room }) => __awaiter(void 0, void 0, void 0, function* () {
+        const { error, user } = yield chat_socket_1.default.addUser({ id: socket.id, user_id, room });
+        if (!error) {
+            yield socket.join(user.room);
+            console.log(`User ${user_id} join room ${user.room}`);
+        }
+    }));
     //Message
-    socket.on("sendMessage", (message, room) => {
+    socket.on("sendMessage", ({ message, room }) => {
         const user = chat_socket_1.default.getUser(socket.id, room);
-        io.to(user.room).emit('message', { user: user.user_id, message: message });
+        if (!user.error) {
+            io.to(user.room).emit('message', { user: user.user_id, message: message });
+            console.log("send success");
+        }
+        console.log("send fail");
     });
     //Leave chat
-    socket.on('leaveChat', (room) => {
+    socket.on('leaveChat', ({ room }) => {
         const user = chat_socket_1.default.getUser(socket.id, room);
         socket.leave(user.room);
+        console.log(`User ${user.user_id} was leave room ${user.room}`);
+    });
+    //Đang nhập
+    socket.on('typing_to_server', function (sender, typing_status) {
+        io.emit('typing_to_client', sender, typing_status);
     });
     socket.on("disconnect", () => {
         const data = users.find((user) => user.socketId === socket.id);
@@ -57,6 +79,7 @@ const SocketServer = (socket, io) => {
             });
         }
     });
+    //Notifi tin nhắn
     //Notification
     socket.on("createNotify", (user_id, notify) => {
         const user_receiver = users.find((user) => user_id.includes(user.id));
