@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = require("../models/User.model");
 const Attachment_model_1 = require("../models/Attachment.model");
 const Channel_model_1 = require("../models/Channel.model");
+const Post_model_1 = require("../models/Post.model");
 const mongoose_1 = require("mongoose");
 const cloudinary = require("cloudinary");
 //0. Lấy thông tin bản thân
@@ -153,6 +154,9 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_model_1.default.findById(req.user['_id']);
+        const post = yield Post_model_1.default.find({
+            user: [...req.user['friend'], req.user['_id']]
+        }).count();
         const list_friend = user.friend;
         let FriendList = [];
         for (let friend in list_friend) {
@@ -169,6 +173,8 @@ const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 "name": friend1.name,
                 "avatar": avatar,
                 "gender": friend1.gender,
+                "friend": friend1.friend.length,
+                "post": post
             };
             FriendList.push(val);
         }

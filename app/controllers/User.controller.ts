@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import User from '../models/User.model'
 import Attachment from '../models/Attachment.model'
 import Channel from "../models/Channel.model";
+import Post from "../models/Post.model"
 import mongoose, { model } from 'mongoose';
 import * as cloudinary from 'cloudinary'
 //0. Lấy thông tin bản thân
@@ -150,6 +151,9 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 const listFriend = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await User.findById(req.user['_id'])
+        const post = await Post.find({
+            user: [...req.user['friend'], req.user['_id']]
+        }).count()
         const list_friend = user.friend
         let FriendList = []
         for (let friend in list_friend) {
@@ -166,6 +170,8 @@ const listFriend = async (req: Request, res: Response, next: NextFunction) => {
                 "name": friend1.name,
                 "avatar": avatar,
                 "gender": friend1.gender,
+                "friend": friend1.friend.length,
+                "post": post
             }
             FriendList.push(val)
         }

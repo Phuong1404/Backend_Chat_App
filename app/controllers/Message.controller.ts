@@ -23,6 +23,7 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
             res.status(400).json({ message: "This not your channel" })
         }
         const message = await Message.find({ channel: String(channel_id) })
+            .sort("-createdAt")
             .populate("attachment")
             .skip(skip)
             .limit(limit)
@@ -213,5 +214,5 @@ const readMessage = async (req: Request, res: Response, next: NextFunction) => {
     res.json({ message: "Done" })
 }
 export default {
-    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel, reactMessage,readMessage
+    getMessageInChannel, deleteMessage, removeMessage, chatMessageInChannel, reactMessage, readMessage
 }

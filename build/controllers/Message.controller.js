@@ -31,6 +31,7 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
             res.status(400).json({ message: "This not your channel" });
         }
         const message = yield Message_model_1.default.find({ channel: String(channel_id) })
+            .sort("-createdAt")
             .populate("attachment")
             .skip(skip)
             .limit(limit);
