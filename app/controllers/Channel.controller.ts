@@ -38,7 +38,6 @@ const addUserToChannel = async (req: Request, res: Response, next: NextFunction)
         return res.status(400).json({ message: "Channel not found" })
     }
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']))
-    console.log(is_MyChannel)
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" })
     }
@@ -69,7 +68,6 @@ const removeUserToChannel = async (req: Request, res: Response, next: NextFuncti
         return res.status(400).json({ message: "Channel not found" })
     }
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']))
-    console.log(is_MyChannel)
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" })
     }
@@ -81,7 +79,6 @@ const removeUserToChannel = async (req: Request, res: Response, next: NextFuncti
             user_channel.push(list_user[user])
         }
     }
-    console.log(user_channel)
     for (let user in user_channel) {
         await Channel.findByIdAndUpdate({ _id: channel_id }, {
             $pull: { user: user_channel[user] },
@@ -102,7 +99,6 @@ const updateChannel = async (req: Request, res: Response, next: NextFunction) =>
         return res.status(400).json({ message: "Channel not found" })
     }
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']))
-    console.log(is_MyChannel)
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" })
     }
@@ -130,7 +126,6 @@ const leaveChannel = async (req: Request, res: Response, next: NextFunction) => 
         return res.status(400).json({ message: "Channel not found" })
     }
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']))
-    console.log(is_MyChannel)
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" })
     }
@@ -149,80 +144,66 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
     let ListValue = []
     for (let i in listChannel) {
         let mess_unread = 0;
+        let lasttime = ""
+        let last = 0
         const messchannel = await Message.find({ channel: listChannel[i].id })
         for (let mess in messchannel) {
             let is_unread = messchannel[mess].unread.find(user => String(user) == String(req.user['_id']))
             if (is_unread) {
                 mess_unread = mess_unread + 1
             }
-            console.log(messchannel[mess].get('createdAt').getTime())
+            if (messchannel[mess].get('createdAt').getTime() > last) {
+                last = messchannel[mess].get('createdAt').getTime()
+                lasttime = messchannel[mess].get('createdAt')
+            }
         }
-        
         if (listChannel[i].num_member == 2) {
             if (messchannel.length > 0) {
                 const user_id = listChannel[i].user.find(user => String(user) != String(req.user['_id']))
                 const user_channel = await User.findOne({ _id: user_id })
+
                 let avatar = ""
-                if (user_channel.avatar) {
-                    const attachment = await Attachment.findOne({ _id: user_channel.avatar })
-                    avatar = attachment.link
-                }
-                let Listattachment = []
-                for (let item in listChannel[i].attachment) {
-                    const attachment = await Attachment.findOne({ _id: listChannel[i].attachment[item] })
-                    const val_att = {
-                        "_id": attachment._id,
-                        "name": attachment.name,
-                        "format_type": attachment.format_type,
-                        "link": attachment.link,
-                        "message_id": attachment.res_id
+                if (user_channel) {
+                    if (user_channel.get('avatar')) {
+                        const attachment = await Attachment.findOne({ _id: user_channel.avatar })
+                        avatar = attachment.link
                     }
-                    Listattachment.push(val_att)
-                }
-                const val = {
-                    "_id": listChannel[i]._id,
-                    "name": user_channel.name,
-                    "avatar": avatar,
-                    "user": [{
+                    const val = {
                         "_id": listChannel[i]._id,
                         "name": user_channel.name,
-                        "avatar": avatar
-                    }],
-                    "num_member": listChannel[i].num_member,
-                    "attachment": Listattachment,
-                    "unread":mess_unread
+                        "avatar": avatar,
+                        "user": [{
+                            "_id": listChannel[i]._id,
+                            "name": user_channel.name,
+                            "avatar": avatar
+                        }],
+                        "num_member": listChannel[i].num_member,
+                        "unread": mess_unread,
+                        "last_message": lasttime
+                    }
+                    ListValue.push(val)
                 }
-                ListValue.push(val)
             }
         }
         else {
-            let Listattachment = []
-            for (let item in listChannel[i].attachment) {
-                const attachment = await Attachment.findOne({ _id: listChannel[i].attachment[item] })
-                const val_att = {
-                    "_id": attachment._id,
-                    "name": attachment.name,
-                    "format_type": attachment.format_type,
-                    "link": attachment.link,
-                    "message_id": attachment.res_id
-                }
-                Listattachment.push(val_att)
-            }
             listChannel[i].user.shift()
             let List_User = []
             for (let u in listChannel[i].user) {
                 const user_channel = await User.findOne({ _id: listChannel[i].user[u] })
                 let avatar = ""
-                if (user_channel.avatar) {
-                    const attachment = await Attachment.findOne({ _id: user_channel.avatar })
-                    avatar = attachment.link
+                if (user_channel) {
+                    if (user_channel.get('avatar')) {
+                        const attachment = await Attachment.findOne({ _id: user_channel.avatar })
+                        avatar = attachment.link
+                    }
+
+                    const val_user = {
+                        "_id": listChannel[i].user[u],
+                        "name": user_channel.name,
+                        "avatar": avatar
+                    }
+                    List_User.push(val_user)
                 }
-                const val_user = {
-                    "_id": listChannel[i].user[u],
-                    "name": user_channel.name,
-                    "avatar": avatar
-                }
-                List_User.push(val_user)
             }
             const val = {
                 "_id": listChannel[i]._id,
@@ -230,8 +211,8 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                 "avatar": "",
                 "user": List_User,
                 "num_member": listChannel[i].num_member,
-                "attachment": Listattachment,
-                "unread":mess_unread
+                "unread": mess_unread,
+                "last_message": lasttime
             }
             ListValue.push(val)
         }

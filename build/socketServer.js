@@ -10,7 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chat_socket_1 = require("./socket/chat.socket");
-[];
+const Channel_model_1 = require("./models/Channel.model");
+let users = [];
 // const EditData = (data, id, call) => {
 //     const newData = data.map((item) => {
 //         item.id === id ? { ...item, call } : item
@@ -36,14 +37,21 @@ const SocketServer = (socket, io) => {
         }
     }));
     //Message
-    socket.on("sendMessage", ({ message, room }) => {
+    socket.on("sendMessage", ({ message, room }) => __awaiter(void 0, void 0, void 0, function* () {
         const user = chat_socket_1.default.getUser(socket.id, room);
         if (!user.error) {
+            let channel_user = yield Channel_model_1.default.findOne({ id: room })['user'];
             io.to(user.room).emit('message', { user: user.user_id, message: message });
+            for (let u in channel_user) {
+                const us = users.find((user) => user.id === channel_user[u]);
+                if (us) {
+                    socket.to(`${us.socketId}`).emit("channel message");
+                }
+            }
             console.log("send success");
         }
         console.log("send fail");
-    });
+    }));
     //Leave chat
     socket.on('leaveChat', ({ room }) => {
         const user = chat_socket_1.default.getUser(socket.id, room);

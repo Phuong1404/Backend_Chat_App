@@ -25,9 +25,6 @@ const getMyUser = async (req: Request, res: Response, next: NextFunction) => {
 //1. Lấy thông tin người dùng
 const getUserPublic = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.user) {
-            console.log(req.user)
-        }
         const user = await User.findById(req.params.id)
             .select("-password -channel -friend_request -status -status_name")
             .populate("friend", "_id name avatar")
@@ -160,14 +157,15 @@ const listFriend = async (req: Request, res: Response, next: NextFunction) => {
             let avatar = ""
             if (friend1.avatar) {
                 const attachment = await Attachment.findOne({ _id: friend1.avatar })
-                avatar = attachment.link
+                if (attachment) {
+                    avatar = attachment.link
+                }
             }
             const val = {
                 "_id": friend1._id,
                 "name": friend1.name,
                 "avatar": avatar,
                 "gender": friend1.gender,
-                "friend": friend1.friend
             }
             FriendList.push(val)
         }

@@ -36,9 +36,6 @@ const getMyUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 //1. Lấy thông tin người dùng
 const getUserPublic = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (req.user) {
-            console.log(req.user);
-        }
         const user = yield User_model_1.default.findById(req.params.id)
             .select("-password -channel -friend_request -status -status_name")
             .populate("friend", "_id name avatar")
@@ -163,14 +160,15 @@ const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             let avatar = "";
             if (friend1.avatar) {
                 const attachment = yield Attachment_model_1.default.findOne({ _id: friend1.avatar });
-                avatar = attachment.link;
+                if (attachment) {
+                    avatar = attachment.link;
+                }
             }
             const val = {
                 "_id": friend1._id,
                 "name": friend1.name,
                 "avatar": avatar,
                 "gender": friend1.gender,
-                "friend": friend1.friend
             };
             FriendList.push(val);
         }
