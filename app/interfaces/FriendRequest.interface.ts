@@ -5,4 +5,5 @@ export default interface IFriendRequest extends Document {
     recever: string;
     status: Number;
     status_name: string;
+    user: [Object];
 }

@@ -26,7 +26,8 @@ const sendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             sender: req.user['_id'],
             recever: recever_id,
             status: 0,
-            status_name: "Send"
+            status_name: "Send",
+            user: [recever_id, req.user['_id']]
         });
         yield newRequest.save();
         yield User_model_1.default.findOneAndUpdate({ _id: req.user['_id'] }, {
@@ -125,7 +126,28 @@ const ListRequestRequest = (req, res, next) => __awaiter(void 0, void 0, void 0,
     ]);
     res.json(ListRequest);
 });
+//6. Xóa bạn bè
+const DeleteFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    //Tìm danh sách channel
+    // const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    const user = yield User_model_1.default.findById(req.user['_id']);
+    if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
+        return res.status(400).json({ message: "Not friends" });
+    }
+    //xóa bạn bè 
+    yield User_model_1.default.findOneAndUpdate({ id: req.user['_id'] }, {
+        $pull: { friend: req.params.id }
+    });
+    yield User_model_1.default.findOneAndUpdate({ id: req.params.id }, {
+        $pull: { friend: req.user['_id'] }
+    });
+    //Tìm friend request
+    const request = yield FriendRequest_model_1.default.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }] });
+    if (request) {
+        yield FriendRequest_model_1.default.findByIdAndDelete({ _id: request._id });
+    }
+});
 exports.default = {
-    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest
+    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest, DeleteFriend
 };
 //# sourceMappingURL=FriendRequest.controller.js.map

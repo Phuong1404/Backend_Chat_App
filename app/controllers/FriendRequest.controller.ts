@@ -16,7 +16,8 @@ const sendRequest = async (req: Request, res: Response, next: NextFunction) => {
             sender: req.user['_id'],
             recever: recever_id,
             status: 0,
-            status_name: "Send"
+            status_name: "Send",
+            user: [recever_id, req.user['_id']]
         })
         await newRequest.save()
         await User.findOneAndUpdate(
@@ -130,17 +131,38 @@ const ListRequestRequest = async (req: Request, res: Response, next: NextFunctio
     const ListRequest = await FriendRequest.find({ $or: [{ 'recever': req.user['_id'] }, { 'sender': req.user['_id'] }] })
         .populate([
             {
-              path: 'recever sender',
-              select: '_id name',
-              populate: {
-                path: 'avatar',
-                select:"link",
-              }
+                path: 'recever sender',
+                select: '_id name',
+                populate: {
+                    path: 'avatar',
+                    select: "link",
+                }
             },
-          ])
+        ])
 
-        res.json(ListRequest);
+    res.json(ListRequest);
+}
+//6. Xóa bạn bè
+const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => {
+    //Tìm danh sách channel
+    // const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    const user = await User.findById(req.user['_id'])
+    if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
+        return res.status(400).json({ message: "Not friends" });
+    }
+    //xóa bạn bè 
+    await User.findOneAndUpdate({ id: req.user['_id'] }, {
+        $pull: { friend: req.params.id }
+    })
+    await User.findOneAndUpdate({ id: req.params.id }, {
+        $pull: { friend: req.user['_id'] }
+    })
+    //Tìm friend request
+    const request = await FriendRequest.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }] })
+    if (request) {
+        await FriendRequest.findByIdAndDelete({ _id: request._id })
+    }
 }
 export default {
-    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest
+    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest,DeleteFriend
 }

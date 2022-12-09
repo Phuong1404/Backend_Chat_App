@@ -61,11 +61,11 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             .populate("avatar", "-_id link");
         // .populate("friend_request");
         let is_friend = false;
-        const channel = yield Channel_model_1.default.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { num_member: 2 }] });
+        const channel = yield Channel_model_1.default.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }, { num_member: 2 }] });
         if (!user) {
             return res.status(400).json({ message: "User does not exist." });
         }
-        if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
+        if (user.friend.findIndex(u => String(u['_id']) == String(req.user['_id'])) != -1) {
             is_friend = true;
         }
         let chan = "";

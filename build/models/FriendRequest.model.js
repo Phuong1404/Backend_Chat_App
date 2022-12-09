@@ -12,6 +12,10 @@ const FriendRequestSchema = new mongoose_1.Schema({
     },
     status: { type: Number },
     status_name: { type: String },
+    user: [{
+            type: mongoose_1.default.Types.ObjectId,
+            ref: "User"
+        }]
 }, {
     timestamps: true,
 });

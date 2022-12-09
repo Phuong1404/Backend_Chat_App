@@ -12,4 +12,6 @@ router.delete('/cancel/:id', extractJWT, controller.CancelRequest)
 router.patch('/accept/:id', extractJWT, controller.AcceptRequest)
 
 router.get('/list', extractJWT, controller.ListRequestRequest)
+
+router.delete('/delete/:id', extractJWT, controller.DeleteFriend)
 export = router
