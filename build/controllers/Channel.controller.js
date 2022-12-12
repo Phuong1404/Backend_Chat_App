@@ -102,7 +102,7 @@ const removeUserToChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
 //4. Update Channel
 const updateChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const channel_id = req.params.id;
-    const { name, avatar } = req.body;
+    const { name } = req.body;
     const channel = yield Channel_model_1.default.findById(channel_id);
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" });
@@ -113,7 +113,7 @@ const updateChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
     yield Channel_model_1.default.findByIdAndUpdate({ _id: channel_id }, {
         name: name,
-        avatar: avatar
+        avatar: ""
     });
     res.json({ message: "Update success" });
 });
@@ -121,7 +121,8 @@ const updateChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 const getChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const channel_id = req.params.id;
     const channel = yield Channel_model_1.default.findById(channel_id)
-        .populate("user", "_id name avatar");
+        .populate("user", "_id name avatar")
+        .populate("attachment");
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" });
     }
@@ -174,7 +175,9 @@ const MyListChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 if (user_channel) {
                     if (user_channel.get('avatar')) {
                         const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
-                        avatar = attachment.link;
+                        if (attachment) {
+                            avatar = attachment.link;
+                        }
                     }
                     const val = {
                         "_id": listChannel[i]._id,
@@ -202,7 +205,9 @@ const MyListChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 if (user_channel) {
                     if (user_channel.get('avatar')) {
                         const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
-                        avatar = attachment.link;
+                        if (attachment) {
+                            avatar = attachment.link;
+                        }
                     }
                     const val_user = {
                         "_id": listChannel[i].user[u],

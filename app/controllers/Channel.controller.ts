@@ -93,7 +93,7 @@ const removeUserToChannel = async (req: Request, res: Response, next: NextFuncti
 //4. Update Channel
 const updateChannel = async (req: Request, res: Response, next: NextFunction) => {
     const channel_id = req.params.id
-    const { name, avatar } = req.body
+    const { name } = req.body
     const channel = await Channel.findById(channel_id)
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" })
@@ -104,7 +104,7 @@ const updateChannel = async (req: Request, res: Response, next: NextFunction) =>
     }
     await Channel.findByIdAndUpdate({ _id: channel_id }, {
         name: name,
-        avatar: avatar
+        avatar: ""
     })
     res.json({ message: "Update success" })
 }
@@ -113,6 +113,7 @@ const getChannel = async (req: Request, res: Response, next: NextFunction) => {
     const channel_id = req.params.id
     const channel = await Channel.findById(channel_id)
         .populate("user", "_id name avatar")
+        .populate("attachment")
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" })
     }
@@ -166,7 +167,9 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                 if (user_channel) {
                     if (user_channel.get('avatar')) {
                         const attachment = await Attachment.findOne({ _id: user_channel.avatar })
-                        avatar = attachment.link
+                        if (attachment) {
+                            avatar = attachment.link
+                        }
                     }
                     const val = {
                         "_id": listChannel[i]._id,
@@ -194,7 +197,9 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                 if (user_channel) {
                     if (user_channel.get('avatar')) {
                         const attachment = await Attachment.findOne({ _id: user_channel.avatar })
-                        avatar = attachment.link
+                        if (attachment) {
+                            avatar = attachment.link
+                        }
                     }
 
                     const val_user = {
