@@ -13,7 +13,7 @@ const MONGO_OPTIONS = {
 //Data deploy
 const MONGO_USERNAME = 'phuong_1404';
 const MONGO_PASSWORD = '14042001Aa';
-const MONGO_HOST = `cluster0.lt8aq68.mongodb.net/Social_Network`;
+const MONGO_HOST = `phuongerpdata.krqve.mongodb.net`;
 
 //Data local
 // const MONGO_USERNAME = 'admin';

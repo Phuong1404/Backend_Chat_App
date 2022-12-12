@@ -1,5 +1,5 @@
 /node_modules
-
+/app/config/config.ts
 /src/public/files
 
 .env

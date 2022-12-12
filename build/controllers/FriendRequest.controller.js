@@ -48,9 +48,9 @@ const RejectRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     if (!request) {
         return res.status(400).json({ message: "Request does not exist." });
     }
-    // if (String(request.recever) != String(req.user['_id'])) {
-    //     return res.status(400).json({ message: "Request is not yours" });
-    // }
+    if (String(request.recever) != String(req.user['_id'])) {
+        return res.status(400).json({ message: "Request is not yours" });
+    }
     yield FriendRequest_model_1.default.findByIdAndDelete({ _id: req.params.id });
     yield User_model_1.default.findOneAndUpdate({ _id: request.sender }, {
         $pull: { friend_request: request.sender }
@@ -66,9 +66,9 @@ const CancelRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     if (!request) {
         return res.status(400).json({ message: "Request does not exist." });
     }
-    // if (String(request.sender) != String(req.user['_id'])) {
-    //     return res.status(400).json({ message: "Request is not yours" });
-    // }
+    if (String(request.sender) != String(req.user['_id'])) {
+        return res.status(400).json({ message: "Request is not yours" });
+    }
     yield FriendRequest_model_1.default.findByIdAndDelete({ _id: req.params.id });
     yield User_model_1.default.findOneAndUpdate({ _id: request.sender }, {
         $pull: { friend_request: request.sender }
