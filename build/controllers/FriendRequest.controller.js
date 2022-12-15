@@ -116,7 +116,17 @@ const ListRequestRequest = (req, res, next) => __awaiter(void 0, void 0, void 0,
     const ListRequest = yield FriendRequest_model_1.default.find({ $or: [{ 'recever': req.user['_id'] }, { 'sender': req.user['_id'] }] })
         .populate([
         {
-            path: 'recever sender',
+            path: 'recever',
+            select: '_id name',
+            populate: {
+                path: 'avatar',
+                select: "link",
+            }
+        },
+    ])
+        .populate([
+        {
+            path: 'sender',
             select: '_id name',
             populate: {
                 path: 'avatar',

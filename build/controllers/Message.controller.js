@@ -116,7 +116,6 @@ const chatMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 
                 reply: reply,
                 channel: channel_id,
                 content: content,
-                attachment: newAttachment._id,
                 unread: unread
             });
             yield newMessage.save();

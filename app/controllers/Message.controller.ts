@@ -114,7 +114,6 @@ const chatMessageInChannel = async (req: Request, res: Response, next: NextFunct
                 reply: reply,
                 channel: channel_id,
                 content: content,
-                attachment: newAttachment._id,
                 unread: unread
             })
             await newMessage.save()

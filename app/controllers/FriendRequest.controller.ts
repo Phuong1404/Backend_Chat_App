@@ -131,7 +131,17 @@ const ListRequestRequest = async (req: Request, res: Response, next: NextFunctio
     const ListRequest = await FriendRequest.find({ $or: [{ 'recever': req.user['_id'] }, { 'sender': req.user['_id'] }] })
         .populate([
             {
-                path: 'recever sender',
+                path: 'recever',
+                select: '_id name',
+                populate: {
+                    path: 'avatar',
+                    select: "link",
+                }
+            },
+        ])
+        .populate([
+            {
+                path: 'sender',
                 select: '_id name',
                 populate: {
                     path: 'avatar',

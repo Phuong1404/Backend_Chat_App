@@ -49,28 +49,37 @@ const SocketServer = (socket, io) => {
     socket.on('leaveChat', ({ room }) => {
         const user = chatsocket.getUser(socket.id, room)
         socket.leave(user.room)
+        chatsocket.removeUser(socket.id, room)
         console.log(`User ${user.user_id} was leave room ${user.room}`)
     })
     //Đang nhập
-    socket.on('typing_to_server', function (sender, typing_status) {
-        io.emit('typing_to_client', sender, typing_status);
+    //Truyền xuống Tên người đang gõ,Phòng và trạng thái
+    //Trạng thái 0 là ko gõ 1 là đang gõ
+    socket.on('typing_to_server', function (sender, room, typing_status) {
+        io.emit('typing_to_client', sender, room, typing_status);
     });
 
-    // socket.on("disconnect", () => {
-    //     const data = users.find((user) => user.socketId === socket.id);
-    //     if (data) {
-    //         const clients = users.filter((user) =>
-    //             data.friend.find((item) => item._id === user.id)
-    //         );
+    socket.on("disconnect", () => {
+        chatsocket.disconnectRoom(socket.id)
+        let u = users.findIndex((user) => user.socketId === socket.id);
+        if (u) {
+            users.splice(u, 1);
+        }
+        console.log(`User ${socket.id} was disconnect socket`)
+        // const data = users.find((user) => user.socketId === socket.id);
+        // if (data) {
+        //     const clients = users.filter((user) =>
+        //         data.friend.find((item) => item._id === user.id)
+        //     );
 
-    //         if (clients.length > 0) {
-    //             clients.forEach((client) => {
-    //                 socket.to(`${client.socketId}`).emit("CheckUserOffline", data.id);
-    //             });
-    //         }
-    //     }
-    //     users = users.filter((user) => user.socketId !== socket.id);
-    // })
+        //     if (clients.length > 0) {
+        //         clients.forEach((client) => {
+        //             socket.to(`${client.socketId}`).emit("CheckUserOffline", data.id);
+        //         });
+        //     }
+        // }
+        // users = users.filter((user) => user.socketId !== socket.id);
+    })
 
     //Check user Online / Offline
     socket.on("checkUserOnline", (data) => {

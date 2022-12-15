@@ -184,7 +184,39 @@ const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: error.message });
     }
 });
+//5. Đề xuất bạn bè
+const suggestionUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const newArr = [...req.user['friend'], req.user['_id']];
+        const num = req.query.num || 10;
+        const users = yield User_model_1.default.aggregate([
+            {
+                $match: { _id: { $nin: newArr } },
+            },
+            {
+                $sample: { size: Number(num) },
+            },
+            {
+                $project: { 'password': 0, 'friend': 0, 'channel': 0, 'friend_request': 0, 'status': 0, 'status_name': 0, 'time_create': 0, 'createdAt': 0, 'updatedAt': 0 }
+            }
+        ]);
+        const populateQuery = [
+            {
+                path: 'avatar',
+                select: '-_id link',
+            },
+        ];
+        const user1 = yield User_model_1.default.populate(users, populateQuery);
+        return res.json({
+            user1,
+            result: user1.length,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ msg: err.message });
+    }
+});
 exports.default = {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser
 };
 //# sourceMappingURL=User.controller.js.map

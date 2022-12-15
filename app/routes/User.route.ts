@@ -11,4 +11,5 @@ router.patch("/update", extractJWT, uploadImage.single("avatar"), controller.upd
 router.get("/getinfo", extractJWT, controller.getMyUser)
 router.get("/getfiend", extractJWT, controller.listFriend)
 router.get("/get/public/:id", controller.getUserPublic)
+router.get("/suggestion", extractJWT, controller.suggestionUser)
 export = router

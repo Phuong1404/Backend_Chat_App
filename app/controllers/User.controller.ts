@@ -49,7 +49,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
             .populate("avatar", "-_id link")
         // .populate("friend_request");
         let is_friend = false
-        const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+        const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }, { num_member: 2 }] })
         if (!user) {
             return res.status(400).json({ message: "User does not exist." });
         }
@@ -181,6 +181,38 @@ const listFriend = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({ message: error.message })
     }
 }
+//5. Đề xuất bạn bè
+const suggestionUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const newArr = [...req.user['friend'], req.user['_id']];
+        const num = req.query.num || 10;
+        const users = await User.aggregate([
+            {
+                $match: { _id: { $nin: newArr } },
+            },
+            {
+                $sample: { size: Number(num) },
+            },
+            {
+                $project:{'password':0,'friend':0,'channel':0,'friend_request':0,'status':0,'status_name':0,'time_create':0,'createdAt':0,'updatedAt':0}
+            }
+        ])
+        const populateQuery = [
+            {
+                path: 'avatar',
+                select: '-_id link',
+            },
+
+        ];
+        const user1 = await User.populate(users, populateQuery);
+        return res.json({
+            user1,
+            result: user1.length,
+        });
+    } catch (err) {
+        return res.status(500).json({ msg: err.message });
+    }
+}
 export default {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser
 }

@@ -16,7 +16,9 @@ const removeUser = (id, room) => {
     room = room.trim().toLowerCase();
     const index = users1.findIndex((user) => user.id == id && user.room === room);
     if (index !== -1) {
-        return users1.splice(index, 1)[0];
+        users1.splice(index, 1)[0];
+        console.log(users1);
+        return;
     }
 };
 const getUser = (id, room) => {
@@ -30,7 +32,18 @@ const getUser = (id, room) => {
 const getusers1InRoom = (room) => {
     return users1.filter((user) => user.room === room);
 };
+const disconnectRoom = (id) => {
+    let remove = [];
+    for (let i in users1) {
+        if (users1[i].id == id) {
+            remove.push(i);
+        }
+    }
+    for (var i = remove.length - 1; i >= 0; i--) {
+        users1.splice(remove[i], 1);
+    }
+};
 exports.default = {
-    addUser, removeUser, getUser, getusers1InRoom
+    addUser, removeUser, getUser, getusers1InRoom, disconnectRoom
 };
 //# sourceMappingURL=chat.socket.js.map

@@ -11,5 +11,6 @@ router.patch("/update", extractJWT_1.default, uploadImage_1.default.single("avat
 router.get("/getinfo", extractJWT_1.default, User_controller_1.default.getMyUser);
 router.get("/getfiend", extractJWT_1.default, User_controller_1.default.listFriend);
 router.get("/get/public/:id", User_controller_1.default.getUserPublic);
+router.get("/suggestion", extractJWT_1.default, User_controller_1.default.suggestionUser);
 module.exports = router;
 //# sourceMappingURL=User.route.js.map

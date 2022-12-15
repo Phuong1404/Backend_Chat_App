@@ -146,6 +146,7 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
     for (let i in listChannel) {
         let mess_unread = 0;
         let lasttime = ""
+        let last_mess
         let last = 0
         const messchannel = await Message.find({ channel: listChannel[i].id })
         for (let mess in messchannel) {
@@ -156,6 +157,7 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
             if (messchannel[mess].get('createdAt').getTime() > last) {
                 last = messchannel[mess].get('createdAt').getTime()
                 lasttime = messchannel[mess].get('createdAt')
+                last_mess = messchannel[mess]
             }
         }
         if (listChannel[i].num_member == 2) {
@@ -176,13 +178,14 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                         "name": user_channel.name,
                         "avatar": avatar,
                         "user": [{
-                            "_id": listChannel[i]._id,
+                            "_id": user_channel._id,
                             "name": user_channel.name,
                             "avatar": avatar
                         }],
                         "num_member": listChannel[i].num_member,
                         "unread": mess_unread,
-                        "last_message": lasttime
+                        "last_message_time": lasttime,
+                        "last_message": last_mess,
                     }
                     ListValue.push(val)
                 }
@@ -217,7 +220,8 @@ const MyListChannel = async (req: Request, res: Response, next: NextFunction) =>
                 "user": List_User,
                 "num_member": listChannel[i].num_member,
                 "unread": mess_unread,
-                "last_message": lasttime
+                "last_message_time": lasttime,
+                "last_message": last_mess,
             }
             ListValue.push(val)
         }
