@@ -7,7 +7,7 @@
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc",
     "dev": "nodemon --exec ts-node ./app/index.ts",
-    "start": "node build/index.js",
+    "start": "ts-node ./app/index.ts",
     "prod": "nodemon -e ts  --exec \"npm run build && npm run start\""
   },
   "author": "",
