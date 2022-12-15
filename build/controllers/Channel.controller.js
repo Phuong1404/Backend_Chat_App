@@ -122,11 +122,19 @@ const getChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const channel_id = req.params.id;
     const channel = yield Channel_model_1.default.findById(channel_id)
         .populate("user", "_id name avatar")
-        .populate("attachment");
+        .populate("attachment")
+        .populate("avatar", "-_id link");
+    const populateQuery = [
+        {
+            path: 'user.avatar',
+            select: '-_id link',
+        },
+    ];
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" });
     }
-    res.json({ data: channel });
+    const channel1 = yield Channel_model_1.default.populate(channel, populateQuery);
+    res.json({ data: channel1 });
 });
 //6. Leave Channel
 const leaveChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

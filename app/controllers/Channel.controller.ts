@@ -114,10 +114,19 @@ const getChannel = async (req: Request, res: Response, next: NextFunction) => {
     const channel = await Channel.findById(channel_id)
         .populate("user", "_id name avatar")
         .populate("attachment")
+        .populate("avatar", "-_id link")
+    const populateQuery = [
+        {
+            path: 'user.avatar',
+            select: '-_id link',
+        },
+    ];
+    
     if (!channel) {
         return res.status(400).json({ message: "Channel not found" })
     }
-    res.json({ data: channel })
+    const channel1 = await Channel.populate(channel, populateQuery);
+    res.json({ data: channel1 })
 }
 //6. Leave Channel
 const leaveChannel = async (req: Request, res: Response, next: NextFunction) => {
