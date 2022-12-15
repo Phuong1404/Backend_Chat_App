@@ -38,13 +38,13 @@
     "path": "^0.12.7",
     "socket.io": "^4.5.2",
     "tsc": "^2.0.4",
-    "typescript": "^4.8.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.2.3",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
   }
 }
