@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc",
     "dev": "nodemon --exec ts-node ./app/index.ts",
     "start": "node ./build/index.js",
@@ -35,8 +34,9 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemon": "^2.0.19",
     "path": "^0.12.7",
+    "script": "^0.0.12",
     "socket.io": "^4.5.2",
-    "tsc": "^2.0.4",
+    "type": "^2.7.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
