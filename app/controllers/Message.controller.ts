@@ -4,7 +4,7 @@ import Message from '../models/Message.model'
 import Channel from "../models/Channel.model";
 import Attachment from '../models/Attachment.model'
 import User from '../models/User.model'
-import * as cloudinary from 'cloudinary'
+import  cloudinary from 'cloudinary'
 //1.Lấy tất cả tin nhắn trong 1 channel
 //Nếu có trong invisible ko hiện
 const getMessageInChannel = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,10 +17,10 @@ const Attachment_model_1 = __importDefault(require("../models/Attachment.model")
 const logging_1 = __importDefault(require("../config/logging"));
 const config_1 = __importDefault(require("../config/config"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const bcrypt = __importStar(require("bcrypt"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const moment_1 = __importDefault(require("moment"));
-const jwt = __importStar(require("jsonwebtoken"));
-const cloudinary = __importStar(require("cloudinary"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
 const NAMESPACE = 'Auth';
 const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -82,7 +59,7 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
                 type_name: type_name
             });
             //Tạo người dùng mới
-            const passwordHash = yield bcrypt.hash(password, 12);
+            const passwordHash = yield bcrypt_1.default.hash(password, 12);
             const newUser = new User_model_1.default({
                 _id: new mongoose_1.default.Types.ObjectId(),
                 name: name,
@@ -107,7 +84,7 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             yield newUser.save();
             yield newAttachment.save().then(() => __awaiter(void 0, void 0, void 0, function* () {
                 //---------------------------------------------------
-                yield cloudinary.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                yield cloudinary_1.default.v2.uploader.upload(avatar.path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
                     yield Attachment_model_1.default.findByIdAndUpdate({ _id: newAttachment._id }, {
                         link: result.url,
                         user: newUser._id,
@@ -126,7 +103,7 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             });
         }
         else {
-            const passwordHash = yield bcrypt.hash(password, 12);
+            const passwordHash = yield bcrypt_1.default.hash(password, 12);
             const newUser = new User_model_1.default({
                 name: name,
                 email: email,
@@ -166,7 +143,7 @@ const Login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         if (user.length < 1) {
             return res.status(400).json({ message: "Tài khoản này không tồn tại." });
         }
-        const isMatch = yield bcrypt.compare(password, user[0].password);
+        const isMatch = yield bcrypt_1.default.compare(password, user[0].password);
         if (!isMatch) {
             return res.status(400).json({ message: "Mật khẩu không đúng." });
         }
@@ -189,12 +166,12 @@ const Login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 const createAccessToken = (payload) => {
-    return jwt.sign(payload, config_1.default.server.token.secret, {
+    return jsonwebtoken_1.default.sign(payload, config_1.default.server.token.secret, {
         expiresIn: "7d",
     });
 };
 const createRefreshToken = (payload) => {
-    return jwt.sign(payload, config_1.default.server.token.secret, {
+    return jsonwebtoken_1.default.sign(payload, config_1.default.server.token.secret, {
         expiresIn: "30d",
     });
 };
@@ -203,7 +180,7 @@ const GenerateAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0
         const rf_token = req.cookies.refreshtoken;
         if (!rf_token)
             return res.status(400).json({ message: "Đăng nhập ngay." });
-        jwt.verify(rf_token, config_1.default.server.token.secret, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
+        jsonwebtoken_1.default.verify(rf_token, config_1.default.server.token.secret, (error, result) => __awaiter(void 0, void 0, void 0, function* () {
             if (error) {
                 return res.status(400).json({ message: "Đăng nhập ngay." });
             }
@@ -239,12 +216,12 @@ const ChangePass = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (!user) {
             return res.status(400).json({ message: "Tài khoản này không tồn tại." });
         }
-        const isMatch = yield bcrypt.compare(password, user.password);
+        const isMatch = yield bcrypt_1.default.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Mật khẩu không đúng." });
         }
         yield User_model_1.default.findOneAndUpdate({ _id: req.user['_id'] }, {
-            password: yield bcrypt.hash(newpassword, 12)
+            password: yield bcrypt_1.default.hash(newpassword, 12)
         });
         res.json({ message: "Update success!" });
     }

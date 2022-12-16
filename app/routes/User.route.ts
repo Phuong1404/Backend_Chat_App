@@ -1,4 +1,4 @@
-import * as express from 'express'
+import  express from 'express'
 import controller from '../controllers/User.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';

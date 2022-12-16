@@ -4,10 +4,10 @@ import Attachment from '../models/Attachment.model'
 import logging from "../config/logging";
 import config from "../config/config";
 import mongoose, { model } from 'mongoose';
-import * as bcrypt from 'bcrypt';
+import  bcrypt from 'bcrypt';
 import moment from "moment";
-import * as jwt from 'jsonwebtoken';
-import * as cloudinary from 'cloudinary'
+import  jwt from 'jsonwebtoken';
+import  cloudinary from 'cloudinary'
 
 const NAMESPACE = 'Auth'
 

@@ -1,5 +1,5 @@
 import multer from 'multer';
-import * as md5 from 'md5';
+import  md5 from 'md5';
 import moment from "moment";
 
 const maxSize = 20 * 1024 * 1024

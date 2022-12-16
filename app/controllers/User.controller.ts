@@ -4,7 +4,7 @@ import Attachment from '../models/Attachment.model'
 import Channel from "../models/Channel.model";
 import Post from "../models/Post.model"
 import mongoose, { model } from 'mongoose';
-import * as cloudinary from 'cloudinary'
+import  cloudinary from 'cloudinary'
 //0. Lấy thông tin bản thân
 const getMyUser = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.user['_id'])

@@ -5,7 +5,7 @@ import Post from "../models/Post.model";
 import Comment from "../models/Comment.model";
 import Attachment from '../models/Attachment.model'
 import moment from "moment";
-import * as cloudinary from 'cloudinary'
+import  cloudinary from 'cloudinary'
 import logging from "../config/logging";
 const NAMESPACE = "POST"
 
