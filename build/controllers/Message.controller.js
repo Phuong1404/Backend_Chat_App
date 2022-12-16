@@ -45,7 +45,7 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
                 List_Message.push(message[mess]);
             }
         }
-        res.json({ data: List_Message });
+        res.json({ data: List_Message.reverse() });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

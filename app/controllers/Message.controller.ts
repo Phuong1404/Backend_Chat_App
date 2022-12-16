@@ -34,7 +34,7 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
                 List_Message.push(message[mess])
             }
         }
-        res.json({ data: List_Message })
+        res.json({ data: List_Message.reverse() })
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

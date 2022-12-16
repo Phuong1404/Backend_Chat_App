@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = __importDefault(require("../Config/config"));
+const config_1 = __importDefault(require("../config/config"));
 const User_model_1 = __importDefault(require("../models/User.model"));
 const NAMESPACE = 'Auth';
 const extractJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

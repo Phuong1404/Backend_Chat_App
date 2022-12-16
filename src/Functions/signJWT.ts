@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import config from '../Config/config';
+import config from '../config/config';
 import logging from '../Config/logging';
 import IUser from 'Interfaces/User.interface';
 

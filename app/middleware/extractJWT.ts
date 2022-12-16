@@ -1,6 +1,6 @@
 import  jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from "express";
-import config from '../Config/config';
+import config from '../config/config';
 import User from '../models/User.model'
 
 const NAMESPACE = 'Auth';

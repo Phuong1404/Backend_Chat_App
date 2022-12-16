@@ -4,8 +4,8 @@ import Message from '../Models/Message.model'
 import Channel from '../Models/Channel.model'
 import * as bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import logging from "../Config/logging";
-import Config from "../Config/config";
+import logging from "../config/logging";
+import Config from "../config/config";
 import signJWT from "../Functions/signJWT"
 import * as jwt from 'jsonwebtoken';
 import moment = require("moment");

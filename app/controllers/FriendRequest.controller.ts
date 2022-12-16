@@ -172,6 +172,7 @@ const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => 
     if (request) {
         await FriendRequest.findByIdAndDelete({ _id: request._id })
     }
+    res.json("Delete success")
 }
 export default {
     sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest,DeleteFriend

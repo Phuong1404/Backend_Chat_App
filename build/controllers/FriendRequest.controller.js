@@ -159,6 +159,7 @@ const DeleteFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     if (request) {
         yield FriendRequest_model_1.default.findByIdAndDelete({ _id: request._id });
     }
+    res.json("Delete success");
 });
 exports.default = {
     sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest, DeleteFriend

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import * as bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import logging from "../Config/logging";
-import Config from "../Config/config";
+import logging from "../config/logging";
+import Config from "../config/config";
 import User from '../Models/User.model'
 import Channel from "../Models/Channel.model";
 import * as jwt from 'jsonwebtoken';

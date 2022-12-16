@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import logging from "../Config/logging";
-import Config from "../Config/config";
+import logging from "../config/logging";
+import Config from "../config/config";
 import User from "../Models/User.model"
 import Channel from "../Models/Channel.model";
 import Message from "../Models/Message.model"
 import ChatHistory from "../Models/ChatHistory.model";
 import * as jwt from 'jsonwebtoken';
-import moment = require("moment");
+import moment from "moment";
 
 const NAMESPACE = "Message"
 
