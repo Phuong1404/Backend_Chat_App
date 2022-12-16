@@ -2,7 +2,7 @@ import  express from 'express'
 import controller from '../controllers/Notification.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
-import uploadImage from '../Middleware/uploadImage'
+import uploadImage from '../middleware/uploadImage'
 
 router.post('/', extractJWT, controller.createNotify)
 

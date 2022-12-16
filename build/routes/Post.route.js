@@ -6,7 +6,7 @@ const express_1 = __importDefault(require("express"));
 const Post_controller_1 = __importDefault(require("../controllers/Post.controller"));
 const router = express_1.default.Router();
 const extractJWT_1 = __importDefault(require("../middleware/extractJWT"));
-const uploadImage_1 = __importDefault(require("../Middleware/uploadImage"));
+const uploadImage_1 = __importDefault(require("../middleware/uploadImage"));
 router.post('/', extractJWT_1.default, uploadImage_1.default.array("files", 6), Post_controller_1.default.createPost);
 router.get('/', extractJWT_1.default, Post_controller_1.default.getPosts);
 router.patch('/:id', extractJWT_1.default, Post_controller_1.default.updatePost);

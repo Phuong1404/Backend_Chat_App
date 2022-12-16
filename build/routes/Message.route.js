@@ -6,7 +6,7 @@ const express_1 = __importDefault(require("express"));
 const Message_controller_1 = __importDefault(require("../controllers/Message.controller"));
 const router = express_1.default.Router();
 const extractJWT_1 = __importDefault(require("../middleware/extractJWT"));
-const uploadImage_1 = __importDefault(require("../Middleware/uploadImage"));
+const uploadImage_1 = __importDefault(require("../middleware/uploadImage"));
 router.get('/channel/:id', extractJWT_1.default, Message_controller_1.default.getMessageInChannel);
 router.post('/send/:id', extractJWT_1.default, uploadImage_1.default.single('file'), Message_controller_1.default.chatMessageInChannel);
 router.patch('/remove/:id', extractJWT_1.default, Message_controller_1.default.removeMessage);

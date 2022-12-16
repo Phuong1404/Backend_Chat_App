@@ -2,7 +2,7 @@ import  express from 'express'
 import controller from '../controllers/Comment.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
-import uploadImage from '../Middleware/uploadImage'
+import uploadImage from '../middleware/uploadImage'
 
 
 router.post('/:id', extractJWT, uploadImage.array("files", 6), controller.createComment)

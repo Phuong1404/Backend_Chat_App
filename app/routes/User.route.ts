@@ -2,7 +2,7 @@ import  express from 'express'
 import controller from '../controllers/User.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
-import uploadImage from '../Middleware/uploadImage'
+import uploadImage from '../middleware/uploadImage'
 
 router.get("/get/:id", extractJWT, controller.getUser)
 router.get("/search", extractJWT, controller.searchUser)

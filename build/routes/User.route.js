@@ -6,7 +6,7 @@ const express_1 = __importDefault(require("express"));
 const User_controller_1 = __importDefault(require("../controllers/User.controller"));
 const router = express_1.default.Router();
 const extractJWT_1 = __importDefault(require("../middleware/extractJWT"));
-const uploadImage_1 = __importDefault(require("../Middleware/uploadImage"));
+const uploadImage_1 = __importDefault(require("../middleware/uploadImage"));
 router.get("/get/:id", extractJWT_1.default, User_controller_1.default.getUser);
 router.get("/search", extractJWT_1.default, User_controller_1.default.searchUser);
 router.patch("/update", extractJWT_1.default, uploadImage_1.default.single("avatar"), User_controller_1.default.updateUser);
