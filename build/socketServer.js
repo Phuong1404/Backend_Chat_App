@@ -8,9 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const chat_socket_1 = require("./socket/chat.socket");
-const Channel_model_1 = require("./models/Channel.model");
+const chat_socket_1 = __importDefault(require("./socket/chat.socket"));
+const Channel_model_1 = __importDefault(require("./models/Channel.model"));
 let users = [];
 // const EditData = (data, id, call) => {
 //     const newData = data.map((item) => {

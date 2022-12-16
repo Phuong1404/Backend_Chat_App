@@ -1,23 +1,23 @@
-import * as http from 'http'
-import * as bodyParser from "body-parser";
-import * as cookieParser from 'cookie-parser'
-import * as express from 'express'
+import http from 'http'
+import bodyParser from "body-parser";
+import cookieParser from 'cookie-parser'
+import express from 'express';
 import logging from './config/logging';
 import config from './config/config';
 import mongoose from 'mongoose'
-import * as authRoutes from './routes/Auth.route'
-import * as userRoutes from './routes/User.route'
-import * as requestRoutes from './routes/FriendRequest.route'
-import * as channelRoutes from './routes/Channel.route'
-import * as messageRoutes from './routes/Message.route'
-import * as notifyRoutes from './routes/Notification.route'
-import * as postRoutes from './routes/Post.route'
-import * as commentRoutes from './routes/Comment.route'
-import * as path from 'path'
-import * as cors from 'cors';
-import * as cloudinary from 'cloudinary'
-import * as socketio from "socket.io"
-import  SocketServer from "./socketServer"
+import authRoutes from './routes/Auth.route'
+import userRoutes from './routes/User.route'
+import requestRoutes from './routes/FriendRequest.route'
+import channelRoutes from './routes/Channel.route'
+import messageRoutes from './routes/Message.route'
+import notifyRoutes from './routes/Notification.route'
+import postRoutes from './routes/Post.route'
+import commentRoutes from './routes/Comment.route'
+import path from 'path'
+import cors from 'cors';
+import  cloudinary from 'cloudinary'
+import  socketio from "socket.io"
+import SocketServer from "./socketServer"
 //------------------------------------
 require('./models/Channel.model')
 require('./models/User.model')
@@ -50,12 +50,12 @@ mongoose
 
 /** Connect Socket*/
 const httpServer = http.createServer(app);
-let io = require("socket.io")(httpServer,{cors:{origin:"*"}});
+let io = require("socket.io")(httpServer, { cors: { origin: "*" } });
 
 
 io.on("connection", (socket) => {
     console.log("Open connection")
-    SocketServer(socket,io);
+    SocketServer(socket, io);
 });
 
 /** Log the request */

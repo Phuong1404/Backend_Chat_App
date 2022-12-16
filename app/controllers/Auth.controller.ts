@@ -5,7 +5,7 @@ import logging from "../config/logging";
 import config from "../config/config";
 import mongoose, { model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import * as moment from "moment";
+import moment from "moment";
 import * as jwt from 'jsonwebtoken';
 import * as cloudinary from 'cloudinary'
 

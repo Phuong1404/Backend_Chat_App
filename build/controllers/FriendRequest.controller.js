@@ -8,11 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = require("mongoose");
-const FriendRequest_model_1 = require("../models/FriendRequest.model");
-const Channel_model_1 = require("../models/Channel.model");
-const User_model_1 = require("../models/User.model");
+const mongoose_1 = __importDefault(require("mongoose"));
+const FriendRequest_model_1 = __importDefault(require("../models/FriendRequest.model"));
+const Channel_model_1 = __importDefault(require("../models/Channel.model"));
+const User_model_1 = __importDefault(require("../models/User.model"));
 //1. Gửi yêu cầu kết bạn
 const sendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -1,23 +1,26 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const http = require("http");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const express = require("express");
-const logging_1 = require("./config/logging");
-const config_1 = require("./config/config");
-const mongoose_1 = require("mongoose");
-const authRoutes = require("./routes/Auth.route");
-const userRoutes = require("./routes/User.route");
-const requestRoutes = require("./routes/FriendRequest.route");
-const channelRoutes = require("./routes/Channel.route");
-const messageRoutes = require("./routes/Message.route");
-const notifyRoutes = require("./routes/Notification.route");
-const postRoutes = require("./routes/Post.route");
-const commentRoutes = require("./routes/Comment.route");
-const cors = require("cors");
-const cloudinary = require("cloudinary");
-const socketServer_1 = require("./socketServer");
+const http_1 = __importDefault(require("http"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const express_1 = __importDefault(require("express"));
+const logging_1 = __importDefault(require("./config/logging"));
+const config_1 = __importDefault(require("./config/config"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const Auth_route_1 = __importDefault(require("./routes/Auth.route"));
+const User_route_1 = __importDefault(require("./routes/User.route"));
+const FriendRequest_route_1 = __importDefault(require("./routes/FriendRequest.route"));
+const Channel_route_1 = __importDefault(require("./routes/Channel.route"));
+const Message_route_1 = __importDefault(require("./routes/Message.route"));
+const Notification_route_1 = __importDefault(require("./routes/Notification.route"));
+const Post_route_1 = __importDefault(require("./routes/Post.route"));
+const Comment_route_1 = __importDefault(require("./routes/Comment.route"));
+const cors_1 = __importDefault(require("cors"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
+const socketServer_1 = __importDefault(require("./socketServer"));
 //------------------------------------
 require('./models/Channel.model');
 require('./models/User.model');
@@ -30,9 +33,9 @@ require('./models/SavePost.model');
 require('./models/Comment.model');
 //------------------------------------
 const NAMESPACE = 'Server';
-const app = express();
+const app = (0, express_1.default)();
 /** Connect Cloudinary */
-cloudinary.v2.config({
+cloudinary_1.default.v2.config({
     cloud_name: 'dhb7ha8no',
     api_key: '478952913943714',
     api_secret: 'Ukrcg0n1MGn9k4kMAH7jmmmIp00'
@@ -47,7 +50,7 @@ mongoose_1.default
     logging_1.default.error(NAMESPACE, error.message, error);
 });
 /** Connect Socket*/
-const httpServer = http.createServer(app);
+const httpServer = http_1.default.createServer(app);
 let io = require("socket.io")(httpServer, { cors: { origin: "*" } });
 io.on("connection", (socket) => {
     console.log("Open connection");
@@ -64,10 +67,10 @@ app.use((req, res, next) => {
     next();
 });
 /** Parse the body of the request */
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cors());
-app.use(cookieParser());
+app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use(body_parser_1.default.json());
+app.use((0, cors_1.default)());
+app.use((0, cookie_parser_1.default)());
 /** Rules of our API */
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -79,14 +82,14 @@ app.use((req, res, next) => {
     next();
 });
 /** Routes */
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/request', requestRoutes);
-app.use('/channel', channelRoutes);
-app.use('/message', messageRoutes);
-app.use('/notify', notifyRoutes);
-app.use('/post', postRoutes);
-app.use('/comment', commentRoutes);
+app.use('/auth', Auth_route_1.default);
+app.use('/user', User_route_1.default);
+app.use('/request', FriendRequest_route_1.default);
+app.use('/channel', Channel_route_1.default);
+app.use('/message', Message_route_1.default);
+app.use('/notify', Notification_route_1.default);
+app.use('/post', Post_route_1.default);
+app.use('/comment', Comment_route_1.default);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

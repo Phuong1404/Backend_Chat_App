@@ -1,6 +1,6 @@
-import * as multer from 'multer'
+import multer from 'multer';
 import * as md5 from 'md5';
-import * as moment from "moment";
+import moment from "moment";
 
 const maxSize = 20 * 1024 * 1024
 const storage = multer.diskStorage({
