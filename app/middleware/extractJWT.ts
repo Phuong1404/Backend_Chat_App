@@ -1,13 +1,11 @@
 import  jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from "express";
-import logging from '../Config/logging';
 import config from '../Config/config';
 import User from '../models/User.model'
 
 const NAMESPACE = 'Auth';
 
 const extractJWT = async (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, 'Validating token');
     try {
         let token = req.headers.authorization?.split(' ')[1];
         if (!token) {

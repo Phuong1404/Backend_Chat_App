@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = __importDefault(require("../models/User.model"));
 const Attachment_model_1 = __importDefault(require("../models/Attachment.model"));
-const logging_1 = __importDefault(require("../config/logging"));
 const config_1 = __importDefault(require("../config/config"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -132,7 +131,6 @@ const Register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         }
     }
     catch (error) {
-        logging_1.default.error(NAMESPACE, error.message, error);
         return res.status(500).json({ message: error.message });
     }
 });
@@ -161,7 +159,6 @@ const Login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        logging_1.default.error(NAMESPACE, error.message, error);
         return res.status(500).json({ message: error.message });
     }
 });

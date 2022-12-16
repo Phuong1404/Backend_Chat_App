@@ -6,7 +6,6 @@ import Comment from "../models/Comment.model";
 import Attachment from '../models/Attachment.model'
 import moment from "moment";
 import  cloudinary from 'cloudinary'
-import logging from "../config/logging";
 const NAMESPACE = "POST"
 
 //1. Tạo bài post
@@ -62,7 +61,6 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                     }
                 }
             }).catch((error) => {
-                logging.error(NAMESPACE, error.message, error)
                 return res.status(500).json({ message: error.message });
             })
             res.json({message:'Success'})

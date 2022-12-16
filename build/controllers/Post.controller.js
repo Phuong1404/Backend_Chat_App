@@ -18,7 +18,6 @@ const Comment_model_1 = __importDefault(require("../models/Comment.model"));
 const Attachment_model_1 = __importDefault(require("../models/Attachment.model"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
-const logging_1 = __importDefault(require("../config/logging"));
 const NAMESPACE = "POST";
 //1. Tạo bài post
 const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -68,7 +67,6 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                     }
                 }
             })).catch((error) => {
-                logging_1.default.error(NAMESPACE, error.message, error);
                 return res.status(500).json({ message: error.message });
             });
             res.json({ message: 'Success' });

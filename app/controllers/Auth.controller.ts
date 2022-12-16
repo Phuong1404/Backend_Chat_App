@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User from '../models/User.model'
 import Attachment from '../models/Attachment.model'
-import logging from "../config/logging";
 import config from "../config/config";
 import mongoose, { model } from 'mongoose';
 import  bcrypt from 'bcrypt';
@@ -135,7 +134,6 @@ const Register = async (req: Request, res: Response, next: NextFunction) => {
 
     }
     catch (error) {
-        logging.error(NAMESPACE, error.message, error)
         return res.status(500).json({ message: error.message });
     }
 }
@@ -168,7 +166,6 @@ const Login = async (req: Request, res: Response, next: NextFunction) => {
         });
     }
     catch (error) {
-        logging.error(NAMESPACE, error.message, error)
         return res.status(500).json({ message: error.message });
     }
 }

@@ -5,7 +5,6 @@ import Attachment from "../models/Attachment.model";
 import Post from "../models/Post.model";
 import moment from "moment";
 import  cloudinary from 'cloudinary'
-import logging from "../config/logging";
 const NAMESPACE = "COMMENT"
 
 //1. Tạo comment
@@ -64,7 +63,6 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
                     }
                 }
             }).catch((error) => {
-                logging.error(NAMESPACE, error.message, error)
                 return res.status(500).json({ message: error.message });
             })
             await Post.findByIdAndUpdate({ _id: post_id },
