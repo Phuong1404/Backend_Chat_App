@@ -29,7 +29,7 @@ const MONGO = {
     // url: `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
 };
 const SERVER_HOSTNAME = 'localhost' || process.env.SERVER_HOSTNAME;
-const SERVER_PORT = 8088 || process.env.SERVER_PORT;
+const SERVER_PORT = process.env.PORT || 8088;
 const SERVER_TOKEN_EXPIRETIME = 3600 || process.env.SERVER_TOKEN_EXPIRETIME;
 const SERVER_TOKEN_ISSUER = 'coolIssuer' || process.env.SERVER_TOKEN_ISSUER;
 const SERVER_TOKEN_SECRET = 'SocialMedia' || process.env.SERVER_TOKEN_SECRET;
