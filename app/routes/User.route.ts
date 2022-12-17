@@ -1,4 +1,4 @@
-import  express from 'express'
+import express from 'express'
 import controller from '../controllers/User.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
@@ -12,4 +12,5 @@ router.get("/getinfo", extractJWT, controller.getMyUser)
 router.get("/getfiend", extractJWT, controller.listFriend)
 router.get("/get/public/:id", controller.getUserPublic)
 router.get("/suggestion", extractJWT, controller.suggestionUser)
+router.get("/not/friend", extractJWT, controller.allUserNotFriend);
 export = router

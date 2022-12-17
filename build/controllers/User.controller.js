@@ -219,7 +219,18 @@ const suggestionUser = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         return res.status(500).json({ msg: err.message });
     }
 });
+//6. Get All User Not Friend
+const allUserNotFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const newArr = [...req.user['friend'], req.user['_id']];
+    const user = yield User_model_1.default.find({ id: { $nin: newArr } })
+        .select('_id name')
+        .populate("avatar", "-_id link");
+    return res.json({
+        user,
+        result: user.length,
+    });
+});
 exports.default = {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser, allUserNotFriend
 };
 //# sourceMappingURL=User.controller.js.map

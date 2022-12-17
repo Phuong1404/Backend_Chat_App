@@ -88,6 +88,14 @@ const SocketServer = (socket, io) => {
         // }
         // users = users.filter((user) => user.socketId !== socket.id);
     });
+    socket.on('disconnecting', (reason) => {
+        chat_socket_1.default.disconnectRoom(socket.id);
+        let u = users.findIndex((user) => user.socketId === socket.id);
+        if (u) {
+            users.splice(u, 1);
+        }
+        console.log(`User ${socket.id} disconnecting socket now`);
+    });
     //Check user Online / Offline
     socket.on("checkUserOnline", (data) => {
         const friend = users.filter((user) => data.friend.find((item) => item._id === user.id));

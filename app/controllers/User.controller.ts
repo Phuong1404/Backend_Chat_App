@@ -4,7 +4,7 @@ import Attachment from '../models/Attachment.model'
 import Channel from "../models/Channel.model";
 import Post from "../models/Post.model"
 import mongoose, { model } from 'mongoose';
-import  cloudinary from 'cloudinary'
+import cloudinary from 'cloudinary'
 //0. Lấy thông tin bản thân
 const getMyUser = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.user['_id'])
@@ -194,7 +194,7 @@ const suggestionUser = async (req: Request, res: Response, next: NextFunction) =
                 $sample: { size: Number(num) },
             },
             {
-                $project:{'password':0,'friend':0,'channel':0,'friend_request':0,'status':0,'status_name':0,'time_create':0,'createdAt':0,'updatedAt':0}
+                $project: { 'password': 0, 'friend': 0, 'channel': 0, 'friend_request': 0, 'status': 0, 'status_name': 0, 'time_create': 0, 'createdAt': 0, 'updatedAt': 0 }
             }
         ])
         const populateQuery = [
@@ -213,6 +213,17 @@ const suggestionUser = async (req: Request, res: Response, next: NextFunction) =
         return res.status(500).json({ msg: err.message });
     }
 }
+//6. Get All User Not Friend
+const allUserNotFriend = async (req: Request, res: Response, next: NextFunction) => {
+    const newArr = [...req.user['friend'], req.user['_id']];
+    const user = await User.find({ id: { $nin: newArr } })
+        .select('_id name')
+        .populate("avatar", "-_id link")
+    return res.json({
+        user,
+        result: user.length,
+    });
+}
 export default {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser, allUserNotFriend
 }
