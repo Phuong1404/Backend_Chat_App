@@ -92,10 +92,42 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const post = yield Post_model_1.default.find({
             user: [...req.user['friend'], req.user['_id']]
         }).sort("-createdAt")
-            .populate("user", "name avatar");
+            .populate("user", "name avatar")
+            .populate("attachment", "-_id avatar");
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const post1 = yield Post_model_1.default.populate(post, populateQuery);
         res.json({
-            result: post.length,
-            post,
+            result: post1.length,
+            post1,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user_id = req.params.id;
+        const post = yield Post_model_1.default.find({
+            user: user_id
+        }).sort("-createdAt")
+            .populate("user", "name avatar")
+            .populate("attachment", "-_id avatar");
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const post1 = yield Post_model_1.default.populate(post, populateQuery);
+        res.json({
+            result: post1.length,
+            post1,
         });
     }
     catch (err) {
@@ -169,6 +201,6 @@ const getSavePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.default = {
     createPost, getPosts, updatePost, getPost,
-    deletePost, savePost, unSavePost, getSavePost
+    deletePost, savePost, unSavePost, getSavePost, getPostsUser
 };
 //# sourceMappingURL=Post.controller.js.map

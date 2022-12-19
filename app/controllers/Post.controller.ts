@@ -5,7 +5,7 @@ import Post from "../models/Post.model";
 import Comment from "../models/Comment.model";
 import Attachment from '../models/Attachment.model'
 import moment from "moment";
-import  cloudinary from 'cloudinary'
+import cloudinary from 'cloudinary'
 const NAMESPACE = "POST"
 
 //1. Tạo bài post
@@ -36,7 +36,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 _id: new mongoose.Types.ObjectId(),
                 content: content,
                 attachment: attachmentId,
-                user:req.user['_id'],
+                user: req.user['_id'],
                 time: moment,
             })
 
@@ -63,17 +63,17 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
             }).catch((error) => {
                 return res.status(500).json({ message: error.message });
             })
-            res.json({message:'Success'})
+            res.json({ message: 'Success' })
         }
         else {
             const newPost = await new Post({
                 _id: new mongoose.Types.ObjectId(),
                 content: content,
-                user:req.user['_id'],
+                user: req.user['_id'],
                 time: moment,
             })
             await newPost.save()
-            res.json({message:'Success'})
+            res.json({ message: 'Success' })
         }
     }
     catch (err) {
@@ -87,13 +87,43 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
             user: [...req.user['friend'], req.user['_id']]
         }).sort("-createdAt")
             .populate("user", "name avatar")
-
+            .populate("attachment", "-_id avatar")
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const post1 = await Post.populate(post, populateQuery);
         res.json({
-            result: post.length,
-            post,
+            result: post1.length,
+            post1,
         });
     }
     catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+const getPostsUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user_id = req.params.id
+        const post = await Post.find({
+            user: user_id
+        }).sort("-createdAt")
+            .populate("user", "name avatar")
+            .populate("attachment", "-_id avatar")
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const post1 = await Post.populate(post, populateQuery);
+        res.json({
+            result: post1.length,
+            post1,
+        });
+    } catch (err) {
         return res.status(500).json({ message: err.message });
     }
 }
@@ -169,5 +199,5 @@ const getSavePost = async (req: Request, res: Response, next: NextFunction) => {
 }
 export default {
     createPost, getPosts, updatePost, getPost,
-    deletePost, savePost, unSavePost, getSavePost
+    deletePost, savePost, unSavePost, getSavePost,getPostsUser
 }

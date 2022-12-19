@@ -15,5 +15,6 @@ router.delete('/:id', extractJWT_1.default, Post_controller_1.default.deletePost
 router.post('/savepost/:id', extractJWT_1.default, Post_controller_1.default.savePost);
 router.patch('/unsavepost/:id', extractJWT_1.default, Post_controller_1.default.unSavePost);
 router.get('/getsavepost', extractJWT_1.default, Post_controller_1.default.getSavePost);
+router.get('user/:id', extractJWT_1.default, Post_controller_1.default.getPostsUser);
 module.exports = router;
 //# sourceMappingURL=Post.route.js.map
