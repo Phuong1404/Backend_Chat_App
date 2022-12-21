@@ -35,9 +35,9 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
         }
         const message = yield Message_model_1.default.find({ channel: String(channel_id) })
             .sort("-createdAt")
-            .populate("attachment");
-        // .skip(skip)
-        // .limit(limit)
+            .populate("attachment")
+            .skip(skip)
+            .limit(limit);
         const List_Message = [];
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']));
@@ -45,7 +45,7 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
                 List_Message.push(message[mess]);
             }
         }
-        res.json({ data: List_Message.reverse() });
+        res.json({ data: List_Message });
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

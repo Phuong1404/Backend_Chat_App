@@ -25,8 +25,8 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
         const message = await Message.find({ channel: String(channel_id) })
             .sort("-createdAt")
             .populate("attachment")
-            // .skip(skip)
-            // .limit(limit)
+            .skip(skip)
+            .limit(limit)
         const List_Message = []
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']))
@@ -34,7 +34,7 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
                 List_Message.push(message[mess])
             }
         }
-        res.json({ data: List_Message.reverse() })
+        res.json({ data: List_Message })
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
