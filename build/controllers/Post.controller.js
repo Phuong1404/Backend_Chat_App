@@ -40,6 +40,7 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                     type: 0,
                     type_name: "Image"
                 });
+                yield newAttachment.save();
                 listAttachment.push(newAttachment);
                 attachmentId.push(newAttachment.id);
             }

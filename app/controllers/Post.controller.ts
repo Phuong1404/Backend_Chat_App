@@ -29,6 +29,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                     type: 0,
                     type_name: "Image"
                 })
+                await newAttachment.save()
                 listAttachment.push(newAttachment)
                 attachmentId.push(newAttachment.id)
             }
@@ -199,5 +200,5 @@ const getSavePost = async (req: Request, res: Response, next: NextFunction) => {
 }
 export default {
     createPost, getPosts, updatePost, getPost,
-    deletePost, savePost, unSavePost, getSavePost,getPostsUser
+    deletePost, savePost, unSavePost, getSavePost, getPostsUser
 }
