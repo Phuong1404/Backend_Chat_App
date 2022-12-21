@@ -49,7 +49,7 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 content: content,
                 attachment: attachmentId,
                 user: req.user['_id'],
-                time: moment_1.default,
+                time: (0, moment_1.default)(),
             });
             yield newPost.save().then((result) => __awaiter(void 0, void 0, void 0, function* () {
                 if (result) {
@@ -77,7 +77,7 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 _id: new mongoose_1.default.Types.ObjectId(),
                 content: content,
                 user: req.user['_id'],
-                time: moment_1.default,
+                time: (0, moment_1.default)(),
             });
             yield newPost.save();
             res.json({ message: 'Success' });
@@ -92,7 +92,7 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     try {
         const post = yield Post_model_1.default.find({
             user: [...req.user['friend'], req.user['_id']]
-        }).sort("-createdAt")
+        }).sort("createdAt")
             .populate("user", "name avatar")
             .populate("attachment", "-_id avatar");
         const populateQuery = [
@@ -116,7 +116,7 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const user_id = req.params.id;
         const post = yield Post_model_1.default.find({
             user: user_id
-        }).sort("-createdAt")
+        }).sort("createdAt")
             .populate("user", "name avatar")
             .populate("attachment", "-_id avatar");
         const populateQuery = [

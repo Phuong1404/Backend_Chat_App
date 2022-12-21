@@ -38,7 +38,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 content: content,
                 attachment: attachmentId,
                 user: req.user['_id'],
-                time: moment,
+                time: moment(),
             })
 
             await newPost.save().then(async (result) => {
@@ -71,7 +71,7 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 _id: new mongoose.Types.ObjectId(),
                 content: content,
                 user: req.user['_id'],
-                time: moment,
+                time: moment(),
             })
             await newPost.save()
             res.json({ message: 'Success' })
@@ -86,7 +86,7 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const post = await Post.find({
             user: [...req.user['friend'], req.user['_id']]
-        }).sort("-createdAt")
+        }).sort("createdAt")
             .populate("user", "name avatar")
             .populate("attachment", "-_id avatar")
         const populateQuery = [
@@ -110,7 +110,7 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
         const user_id = req.params.id
         const post = await Post.find({
             user: user_id
-        }).sort("-createdAt")
+        }).sort("createdAt")
             .populate("user", "name avatar")
             .populate("attachment", "-_id avatar")
         const populateQuery = [
