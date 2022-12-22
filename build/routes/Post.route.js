@@ -16,6 +16,6 @@ router.post('/savepost/:id', extractJWT_1.default, Post_controller_1.default.sav
 router.patch('/unsavepost/:id', extractJWT_1.default, Post_controller_1.default.unSavePost);
 router.get('/getsavepost', extractJWT_1.default, Post_controller_1.default.getSavePost);
 router.get('/user/:id', extractJWT_1.default, Post_controller_1.default.getPostsUser);
-router.post('/react/:id', extractJWT_1.default, Post_controller_1.default.reactPost);
+router.get('/react/:id', extractJWT_1.default, Post_controller_1.default.reactPost);
 module.exports = router;
 //# sourceMappingURL=Post.route.js.map

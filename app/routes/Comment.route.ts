@@ -8,7 +8,7 @@ import uploadImage from '../middleware/uploadImage'
 router.post('/:id', extractJWT, uploadImage.array("files", 6), controller.createComment)
 router.patch('/:id', extractJWT, controller.updateComment)
 router.delete('/:id', extractJWT, controller.deleteComment)
-router.patch('/react/:id', extractJWT, controller.likeComment)
+router.get('/react/:id', extractJWT, controller.likeComment)
 router.patch('/unlike/:id', extractJWT, controller.unlikeComment)
 router.get('/:id', extractJWT, controller.getComment)
 router.get('/bypost/:id', extractJWT, controller.getComments)
