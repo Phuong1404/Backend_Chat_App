@@ -111,15 +111,16 @@ const likeComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         const comment = yield Comment_model_1.default.findById(req.params.id);
         const is_react = comment.react.find(react => String(react) == String(req.user['_id']));
         if (!is_react) {
-            yield Comment_model_1.default.findByIdAndUpdate({ id: req.params.id }, {
+            yield Comment_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
                 $push: { react: req.user['_id'] }
             });
         }
         else {
-            yield Comment_model_1.default.findByIdAndUpdate({ id: req.params.id }, {
+            yield Comment_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
                 $pull: { react: req.user['_id'] }
             });
         }
+        res.json({ message: 'Done' });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

@@ -142,14 +142,15 @@ const reactPost = async (req: Request, res: Response, next: NextFunction) => {
         const post = await Post.findById(req.params.id)
         const is_react = post.react.find(react => String(react) == String(req.user['_id']))
         if (!is_react) {
-            await Post.findByIdAndUpdate({ id: req.params.id },{
+            await Post.findByIdAndUpdate({ _id: req.params.id },{
                 $push: { react: req.user['_id'] }
             })
         } else {
-            await Post.findByIdAndUpdate({ id: req.params.id },{
+            await Post.findByIdAndUpdate({ _id: req.params.id },{
                 $pull: { react: req.user['_id'] }
             })
         }
+        res.json({message:'Done'})
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
