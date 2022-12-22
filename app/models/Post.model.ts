@@ -9,14 +9,21 @@ const PostSchema: Schema = new Schema(
             type: mongoose.Types.ObjectId,
             ref: "User"
         },
+        // react: [
+        //     {
+        //         user: {
+        //             type: mongoose.Types.ObjectId,
+        //             ref: "User"
+        //         },
+        //         emoji: { type: String }
+        //     }
+        // ],
         react: [
             {
-                user: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "User"
-                },
-                emoji: { type: String }
+                type: mongoose.Types.ObjectId,
+                ref: "User"
             }
+
         ],
         comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
         attachment: [{ type: mongoose.Types.ObjectId, ref: "Attachment" }],

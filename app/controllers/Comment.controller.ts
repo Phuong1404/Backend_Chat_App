@@ -104,7 +104,17 @@ const updateComment = async (req: Request, res: Response, next: NextFunction) =>
 //3. like comment
 const likeComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
+        const comment = await Comment.findById(req.params.id)
+        const is_react = comment.react.find(react => String(react) == String(req.user['_id']))
+        if (!is_react) {
+            await Comment.findByIdAndUpdate({ id: req.params.id },{
+                $push: { react: req.user['_id'] }
+            })
+        } else {
+            await Comment.findByIdAndUpdate({ id: req.params.id },{
+                $pull: { react: req.user['_id'] }
+            })
+        }
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

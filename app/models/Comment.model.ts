@@ -8,16 +8,13 @@ const CommentSchema: Schema = new Schema(
             type: mongoose.Types.ObjectId,
             ref: "User"
         },
-        tag:Object,
+        tag: Object,
         status: { type: Number },
         status_type: { type: String },
         react: [
             {
-                user: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "User"
-                },
-                emoji: { type: String }
+                type: mongoose.Types.ObjectId,
+                ref: "User"
             }
         ],
         attachment: [{ type: mongoose.Types.ObjectId, ref: "Attachment" }],

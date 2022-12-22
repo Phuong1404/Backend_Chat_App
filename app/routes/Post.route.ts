@@ -12,6 +12,7 @@ router.delete('/:id', extractJWT, controller.deletePost)
 router.post('/savepost/:id', extractJWT, controller.savePost)
 router.patch('/unsavepost/:id', extractJWT, controller.unSavePost)
 router.get('/getsavepost', extractJWT, controller.getSavePost)
-router.get('user/:id', extractJWT, controller.getPostsUser)
+router.get('/user/:id', extractJWT, controller.getPostsUser)
+router.post('/react/:id', extractJWT, controller.reactPost)
 export = router
 

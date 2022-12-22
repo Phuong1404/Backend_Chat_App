@@ -137,7 +137,24 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 //4. React post
-//5. Unreact post
+const reactPost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const post = await Post.findById(req.params.id)
+        const is_react = post.react.find(react => String(react) == String(req.user['_id']))
+        if (!is_react) {
+            await Post.findByIdAndUpdate({ id: req.params.id },{
+                $push: { react: req.user['_id'] }
+            })
+        } else {
+            await Post.findByIdAndUpdate({ id: req.params.id },{
+                $pull: { react: req.user['_id'] }
+            })
+        }
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
 //6. Lấy 1 bài post
 const getPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -199,6 +216,6 @@ const getSavePost = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 export default {
-    createPost, getPosts, updatePost, getPost,
+    createPost, getPosts, updatePost, getPost,reactPost,
     deletePost, savePost, unSavePost, getSavePost, getPostsUser
 }

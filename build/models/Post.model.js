@@ -31,13 +31,19 @@ const PostSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: "User"
     },
+    // react: [
+    //     {
+    //         user: {
+    //             type: mongoose.Types.ObjectId,
+    //             ref: "User"
+    //         },
+    //         emoji: { type: String }
+    //     }
+    // ],
     react: [
         {
-            user: {
-                type: mongoose_1.default.Types.ObjectId,
-                ref: "User"
-            },
-            emoji: { type: String }
+            type: mongoose_1.default.Types.ObjectId,
+            ref: "User"
         }
     ],
     comments: [{ type: mongoose_1.default.Types.ObjectId, ref: "Comment" }],

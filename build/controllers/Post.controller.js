@@ -144,7 +144,25 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 //4. React post
-//5. Unreact post
+const reactPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const post = yield Post_model_1.default.findById(req.params.id);
+        const is_react = post.react.find(react => String(react) == String(req.user['_id']));
+        if (!is_react) {
+            yield Post_model_1.default.findByIdAndUpdate({ id: req.params.id }, {
+                $push: { react: req.user['_id'] }
+            });
+        }
+        else {
+            yield Post_model_1.default.findByIdAndUpdate({ id: req.params.id }, {
+                $pull: { react: req.user['_id'] }
+            });
+        }
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
 //6. Lấy 1 bài post
 const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -201,7 +219,7 @@ const getSavePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.default = {
-    createPost, getPosts, updatePost, getPost,
+    createPost, getPosts, updatePost, getPost, reactPost,
     deletePost, savePost, unSavePost, getSavePost, getPostsUser
 };
 //# sourceMappingURL=Post.controller.js.map

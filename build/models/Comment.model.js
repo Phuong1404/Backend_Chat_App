@@ -35,11 +35,8 @@ const CommentSchema = new mongoose_1.Schema({
     status_type: { type: String },
     react: [
         {
-            user: {
-                type: mongoose_1.default.Types.ObjectId,
-                ref: "User"
-            },
-            emoji: { type: String }
+            type: mongoose_1.default.Types.ObjectId,
+            ref: "User"
         }
     ],
     attachment: [{ type: mongoose_1.default.Types.ObjectId, ref: "Attachment" }],
