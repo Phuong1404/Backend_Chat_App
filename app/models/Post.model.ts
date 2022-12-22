@@ -25,5 +25,9 @@ const PostSchema: Schema = new Schema(
         status_type: { type: String },
 
     }
+    ,
+    {
+        timestamps: true,
+    }
 )
 export default mongoose.model<IPost>("Post", PostSchema)

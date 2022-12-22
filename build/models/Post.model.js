@@ -45,6 +45,8 @@ const PostSchema = new mongoose_1.Schema({
     total_react: { type: Number },
     status: { type: Number },
     status_type: { type: String },
+}, {
+    timestamps: true,
 });
 exports.default = mongoose_1.default.model("Post", PostSchema);
 //# sourceMappingURL=Post.model.js.map

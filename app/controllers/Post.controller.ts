@@ -86,9 +86,9 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const post = await Post.find({
             user: [...req.user['friend'], req.user['_id']]
-        }).sort("createdAt")
+        }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id avatar")
+            .populate("attachment", "-_id link")
         const populateQuery = [
             {
                 path: 'user.avatar',
@@ -110,9 +110,9 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
         const user_id = req.params.id
         const post = await Post.find({
             user: user_id
-        }).sort("createdAt")
+        }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id avatar")
+            .populate("attachment", "-_id link")
         const populateQuery = [
             {
                 path: 'user.avatar',

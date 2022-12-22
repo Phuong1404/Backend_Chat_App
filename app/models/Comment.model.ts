@@ -23,6 +23,9 @@ const CommentSchema: Schema = new Schema(
         attachment: [{ type: mongoose.Types.ObjectId, ref: "Attachment" }],
         post_id: { type: mongoose.Types.ObjectId, ref: "Post" },
         parent_comment: { type: mongoose.Types.ObjectId, ref: "Comment" },
+    },
+    {
+        timestamps: true,
     }
 )
 export default mongoose.model<IComment>("Comment", CommentSchema)

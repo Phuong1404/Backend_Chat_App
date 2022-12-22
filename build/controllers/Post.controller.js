@@ -92,9 +92,9 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     try {
         const post = yield Post_model_1.default.find({
             user: [...req.user['friend'], req.user['_id']]
-        }).sort("createdAt")
+        }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id avatar");
+            .populate("attachment", "-_id link");
         const populateQuery = [
             {
                 path: 'user.avatar',
@@ -116,9 +116,9 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const user_id = req.params.id;
         const post = yield Post_model_1.default.find({
             user: user_id
-        }).sort("createdAt")
+        }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id avatar");
+            .populate("attachment", "-_id link");
         const populateQuery = [
             {
                 path: 'user.avatar',

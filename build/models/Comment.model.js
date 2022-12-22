@@ -45,6 +45,8 @@ const CommentSchema = new mongoose_1.Schema({
     attachment: [{ type: mongoose_1.default.Types.ObjectId, ref: "Attachment" }],
     post_id: { type: mongoose_1.default.Types.ObjectId, ref: "Post" },
     parent_comment: { type: mongoose_1.default.Types.ObjectId, ref: "Comment" },
+}, {
+    timestamps: true,
 });
 exports.default = mongoose_1.default.model("Comment", CommentSchema);
 //# sourceMappingURL=Comment.model.js.map
