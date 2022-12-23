@@ -118,7 +118,7 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             user: user_id
         }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id link");
+            .populate("attachment", "_id link");
         const populateQuery = [
             {
                 path: 'user.avatar',
@@ -138,15 +138,20 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 //3. Cập nhật bài post
 const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // upload.array("PhotosList", 6);
-        const { content } = req.body;
+        const { content, file_delete } = req.body;
+        const post = yield Post_model_1.default.findById(req.params.id);
+        //Bỏ những file bị bỏ đi
+        const new_attachment = post.attachment.filter(item => !file_delete.includes(item));
         const files = req.files;
         if (content.length === 0 && !files) {
             return res.status(400).json({ msg: "Please add content or image." });
         }
+        let Content = post.content;
+        if (content.length !== 0) {
+            Content = content;
+        }
         if (files) {
             let listAttachment = [];
-            let attachmentId = [];
             for (let file in files) {
                 const newAttachment = new Attachment_model_1.default({
                     _id: new mongoose_1.default.Types.ObjectId(),
@@ -158,16 +163,11 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 });
                 yield newAttachment.save();
                 listAttachment.push(newAttachment);
-                attachmentId.push(newAttachment.id);
+                new_attachment.push(newAttachment.id);
             }
-            const newPost = new Post_model_1.default({
-                _id: new mongoose_1.default.Types.ObjectId(),
-                content: content,
-                attachment: attachmentId,
-                user: req.user['_id'],
-                time: (0, moment_1.default)(),
-            });
-            yield newPost.save().then((result) => __awaiter(void 0, void 0, void 0, function* () {
+            yield Post_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
+                content: Content
+            }).then((result) => __awaiter(void 0, void 0, void 0, function* () {
                 if (result) {
                     for (let item in listAttachment) {
                         yield listAttachment[item].save();
@@ -177,7 +177,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                                 link: result.url,
                                 user: req.user['_id'],
                                 res_model: "Post",
-                                res_id: newPost._id
+                                res_id: req.params.id
                             });
                         }));
                         //------------------------------------------------
@@ -186,16 +186,6 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             })).catch((error) => {
                 return res.status(500).json({ message: error.message });
             });
-            res.json({ message: 'Success' });
-        }
-        else {
-            const newPost = yield new Post_model_1.default({
-                _id: new mongoose_1.default.Types.ObjectId(),
-                content: content,
-                user: req.user['_id'],
-                time: (0, moment_1.default)(),
-            });
-            yield newPost.save();
             res.json({ message: 'Success' });
         }
     }

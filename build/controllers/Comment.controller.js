@@ -100,6 +100,11 @@ const createComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 //2. Cập nhật comment
 const updateComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { content } = req.body;
+        const comment = yield Comment_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
+            content: content
+        });
+        res.json({ message: "Done" });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

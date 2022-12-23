@@ -224,6 +224,15 @@ const allUserNotFriend = async (req: Request, res: Response, next: NextFunction)
         result: user.length,
     });
 }
+const getListImageUser = async (req: Request, res: Response, next: NextFunction) => {
+    const list_Image = await Attachment.find({ $and: [{ user: req.user['_id'] }, { 'res_model': 'Post' }] })
+    .sort("-createdAt")
+    return res.json({
+        list_Image,
+        result: list_Image.length,
+    });
+}
 export default {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser, allUserNotFriend
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic,
+    suggestionUser, allUserNotFriend, getListImageUser
 }

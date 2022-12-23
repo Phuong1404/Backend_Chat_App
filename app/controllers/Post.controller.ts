@@ -112,7 +112,7 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
             user: user_id
         }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id link")
+            .populate("attachment", "_id link")
         const populateQuery = [
             {
                 path: 'user.avatar',
@@ -131,15 +131,23 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
 //3. Cập nhật bài post
 const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // upload.array("PhotosList", 6);
-        const { content } = req.body
+
+        const { content, file_delete } = req.body
+        
+        const post = await Post.findById(req.params.id)
+        //Bỏ những file bị bỏ đi
+        const new_attachment = post.attachment.filter(item => !file_delete.includes(item));
+
         const files = req.files
         if (content.length === 0 && !files) {
             return res.status(400).json({ msg: "Please add content or image." });
         }
+        let Content = post.content
+        if (content.length !== 0) {
+            Content = content
+        }
         if (files) {
             let listAttachment = []
-            let attachmentId = []
             for (let file in files) {
                 const newAttachment = new Attachment({
                     _id: new mongoose.Types.ObjectId(),
@@ -151,17 +159,12 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
                 })
                 await newAttachment.save()
                 listAttachment.push(newAttachment)
-                attachmentId.push(newAttachment.id)
+                new_attachment.push(newAttachment.id)
             }
-            const newPost = new Post({
-                _id: new mongoose.Types.ObjectId(),
-                content: content,
-                attachment: attachmentId,
-                user: req.user['_id'],
-                time: moment(),
-            })
 
-            await newPost.save().then(async (result) => {
+            await Post.findByIdAndUpdate({ _id: req.params.id }, {
+                content: Content
+            }).then(async (result) => {
                 if (result) {
                     for (let item in listAttachment) {
                         await listAttachment[item].save()
@@ -174,7 +177,7 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
                                     link: result.url,
                                     user: req.user['_id'],
                                     res_model: "Post",
-                                    res_id: newPost._id
+                                    res_id: req.params.id
                                 }
                             )
                         })
@@ -184,16 +187,6 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
             }).catch((error) => {
                 return res.status(500).json({ message: error.message });
             })
-            res.json({ message: 'Success' })
-        }
-        else {
-            const newPost = await new Post({
-                _id: new mongoose.Types.ObjectId(),
-                content: content,
-                user: req.user['_id'],
-                time: moment(),
-            })
-            await newPost.save()
             res.json({ message: 'Success' })
         }
     }
@@ -207,15 +200,15 @@ const reactPost = async (req: Request, res: Response, next: NextFunction) => {
         const post = await Post.findById(req.params.id)
         const is_react = post.react.find(react => String(react) == String(req.user['_id']))
         if (!is_react) {
-            await Post.findByIdAndUpdate({ _id: req.params.id },{
+            await Post.findByIdAndUpdate({ _id: req.params.id }, {
                 $push: { react: req.user['_id'] }
             })
         } else {
-            await Post.findByIdAndUpdate({ _id: req.params.id },{
+            await Post.findByIdAndUpdate({ _id: req.params.id }, {
                 $pull: { react: req.user['_id'] }
             })
         }
-        res.json({message:'Done'})
+        res.json({ message: 'Done' })
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -282,6 +275,6 @@ const getSavePost = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 export default {
-    createPost, getPosts, updatePost, getPost,reactPost,
+    createPost, getPosts, updatePost, getPost, reactPost,
     deletePost, savePost, unSavePost, getSavePost, getPostsUser
 }

@@ -4,7 +4,7 @@ import Comment from "../models/Comment.model";
 import Attachment from "../models/Attachment.model";
 import Post from "../models/Post.model";
 import moment from "moment";
-import  cloudinary from 'cloudinary'
+import cloudinary from 'cloudinary'
 const NAMESPACE = "COMMENT"
 
 //1. Tạo comment
@@ -69,7 +69,7 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
                 {
                     $push: { comments: newComment._id }
                 })
-            res.json({message:'Success'})
+            res.json({ message: 'Success' })
         }
         else {
             const newComment = await new Comment({
@@ -95,6 +95,11 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
 //2. Cập nhật comment
 const updateComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { content } = req.body
+        const comment = await Comment.findByIdAndUpdate({ _id: req.params.id }, {
+            content: content
+        })
+        res.json({message:"Done"})
 
     }
     catch (err) {
@@ -107,15 +112,15 @@ const likeComment = async (req: Request, res: Response, next: NextFunction) => {
         const comment = await Comment.findById(req.params.id)
         const is_react = comment.react.find(react => String(react) == String(req.user['_id']))
         if (!is_react) {
-            await Comment.findByIdAndUpdate({ _id: req.params.id },{
+            await Comment.findByIdAndUpdate({ _id: req.params.id }, {
                 $push: { react: req.user['_id'] }
             })
         } else {
-            await Comment.findByIdAndUpdate({ _id: req.params.id },{
+            await Comment.findByIdAndUpdate({ _id: req.params.id }, {
                 $pull: { react: req.user['_id'] }
             })
         }
-        res.json({message:'Done'})
+        res.json({ message: 'Done' })
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -153,7 +158,7 @@ const getComments = async (req: Request, res: Response, next: NextFunction) => {
             post_id: post_id
         })
             .populate("attachment")
-            .populate("user","_id name avatar")
+            .populate("user", "_id name avatar")
         res.json({
             result: comment.length,
             comment,

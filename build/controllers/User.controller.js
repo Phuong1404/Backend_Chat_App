@@ -230,7 +230,16 @@ const allUserNotFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         result: user.length,
     });
 });
+const getListImageUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const list_Image = yield Attachment_model_1.default.find({ $and: [{ user: req.user['_id'] }, { 'res_model': 'Post' }] })
+        .sort("-createdAt");
+    return res.json({
+        list_Image,
+        result: list_Image.length,
+    });
+});
 exports.default = {
-    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic, suggestionUser, allUserNotFriend
+    getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic,
+    suggestionUser, allUserNotFriend, getListImageUser
 };
 //# sourceMappingURL=User.controller.js.map

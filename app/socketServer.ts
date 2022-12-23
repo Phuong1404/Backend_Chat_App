@@ -35,12 +35,29 @@ const SocketServer = (socket, io) => {
         if (!user.error) {
             let channel_user = await Channel.findOne({ id: room })['user']
             io.to(user.room).emit('message', { user: user.user_id, message: message })
+
             for (let u in channel_user) {
                 const us = users.find((user) => user.id === channel_user[u])
                 if (us) {
                     socket.to(`${us.socketId}`).emit("channel message");
                 }
             }
+            console.log("send success")
+        }
+        console.log("send fail")
+    })
+    socket.on("deleteChat", async ({ message, room }) => {
+        const user = chatsocket.getUser(socket.id, room)
+        if (!user.error) {
+            // let channel_user = await Channel.findOne({ id: room })['user']
+            io.to(user.room).emit('message', { user: user.user_id, message: message })
+
+            // for (let u in channel_user) {
+            //     const us = users.find((user) => user.id === channel_user[u])
+            //     if (us) {
+            //         socket.to(`${us.socketId}`).emit("channel message");
+            //     }
+            // }
             console.log("send success")
         }
         console.log("send fail")
@@ -66,19 +83,6 @@ const SocketServer = (socket, io) => {
             users.splice(u, 1);
         }
         console.log(`User ${socket.id} was disconnect socket`)
-        // const data = users.find((user) => user.socketId === socket.id);
-        // if (data) {
-        //     const clients = users.filter((user) =>
-        //         data.friend.find((item) => item._id === user.id)
-        //     );
-
-        //     if (clients.length > 0) {
-        //         clients.forEach((client) => {
-        //             socket.to(`${client.socketId}`).emit("CheckUserOffline", data.id);
-        //         });
-        //     }
-        // }
-        // users = users.filter((user) => user.socketId !== socket.id);
     })
 
     socket.on('disconnecting', (reason) => {
@@ -89,23 +93,6 @@ const SocketServer = (socket, io) => {
         }
         console.log(`User ${socket.id} disconnecting socket now`)
     });
-    //Check user Online / Offline
-    socket.on("checkUserOnline", (data) => {
-        const friend = users.filter((user) =>
-            data.friend.find((item) => item._id === user.id)
-        )
-        socket.emit("checkUserOnlineToMe", friend);
-        const clients = users.filter((user) =>
-            data.friend.find((item) => item._id === user.id)
-        );
-        if (clients.length > 0) {
-            clients.forEach((client) => {
-                socket
-                    .to(`${client.socketId}`)
-                    .emit("checkUserOnlineToClient", data._id)
-            })
-        }
-    })
     //Notifi tin nhắn
 
     //Notification
@@ -117,17 +104,30 @@ const SocketServer = (socket, io) => {
         const user_receiver = users.find((user) => user_id.includes(user.id));
         user_receiver && socket.to(`${user_id}`).emit("deleteNotifyToClient", notify);
     })
-    // socket.on("createNotify", (msg) => {
-    //     const client = users.find((user) => msg.receiver.includes(user.id));
-    //     client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
-    // });
-
-    // socket.on("deleteNotify", (msg) => {
-    //     const client = users.find((user) => msg.receiver.includes(user.id));
-    //     client && socket.to(`${client.socketId}`).emit("deleteNotifyToClient", msg);
-    // });
-
-
+    //like post
+    socket.on("likepost", async ({ post, user }) => {
+        const user_post = users.find((user) => post.user == user.id);
+        console.log(user_post)
+        socket.to(`${user_post.socketId}`).emit("likepostclient", post, user);
+    })
+    //like comment
+    socket.on("likecomment", async ({ post, user }) => {
+        const user_post = users.find((user) => post.user == user.id);
+        console.log(user_post)
+        socket.to(`${user_post.socketId}`).emit("likecommentclient", post, user);
+    })
+    //bình luận post
+    socket.on("comment", async ({ post, comment, user }) => {
+        const user_post = users.find((user) => post.user == user.id);
+        console.log(user_post)
+        socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
+    })
+    //trả lời comment
+    socket.on("replycomment", async ({ comment, user }) => {
+        const user_comment = users.find((user) => comment.user == user.id);
+        console.log(user_comment)
+        socket.to(`${user_comment.socketId}`).emit("replycommentpostclient", comment, user);
+    })
 
     // //Send friend request
     // socket.on("sendRequest", (msg) => {

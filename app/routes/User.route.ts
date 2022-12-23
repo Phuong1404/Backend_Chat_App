@@ -13,4 +13,5 @@ router.get("/getfiend", extractJWT, controller.listFriend)
 router.get("/get/public/:id", controller.getUserPublic)
 router.get("/suggestion", extractJWT, controller.suggestionUser)
 router.get("/not/friend", extractJWT, controller.allUserNotFriend);
+router.get("/listimage/:id",extractJWT, controller.getListImageUser)
 export = router
