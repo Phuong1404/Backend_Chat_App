@@ -133,7 +133,13 @@ const unlikeComment = async (req: Request, res: Response, next: NextFunction) =>
 //5. xóa comment
 const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const comment = await Comment.findOneAndDelete({
+            _id: req.params.id,
+        });
 
+        res.json({
+            message: "Deleted Post!"
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

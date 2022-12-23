@@ -131,6 +131,71 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
 //3. Cập nhật bài post
 const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // upload.array("PhotosList", 6);
+        const { content } = req.body
+        const files = req.files
+        if (content.length === 0 && !files) {
+            return res.status(400).json({ msg: "Please add content or image." });
+        }
+        if (files) {
+            let listAttachment = []
+            let attachmentId = []
+            for (let file in files) {
+                const newAttachment = new Attachment({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: files[file].filename,
+                    size: String(files[file].size),
+                    format_type: files[file].mimetype,
+                    type: 0,
+                    type_name: "Image"
+                })
+                await newAttachment.save()
+                listAttachment.push(newAttachment)
+                attachmentId.push(newAttachment.id)
+            }
+            const newPost = new Post({
+                _id: new mongoose.Types.ObjectId(),
+                content: content,
+                attachment: attachmentId,
+                user: req.user['_id'],
+                time: moment(),
+            })
+
+            await newPost.save().then(async (result) => {
+                if (result) {
+                    for (let item in listAttachment) {
+                        await listAttachment[item].save()
+
+                        //------------------------------------------------
+                        cloudinary.v2.uploader.upload(files[item].path).then(async (result) => {
+                            await Attachment.findByIdAndUpdate(
+                                { _id: listAttachment[item]._id },
+                                {
+                                    link: result.url,
+                                    user: req.user['_id'],
+                                    res_model: "Post",
+                                    res_id: newPost._id
+                                }
+                            )
+                        })
+                        //------------------------------------------------
+                    }
+                }
+            }).catch((error) => {
+                return res.status(500).json({ message: error.message });
+            })
+            res.json({ message: 'Success' })
+        }
+        else {
+            const newPost = await new Post({
+                _id: new mongoose.Types.ObjectId(),
+                content: content,
+                user: req.user['_id'],
+                time: moment(),
+            })
+            await newPost.save()
+            res.json({ message: 'Success' })
+        }
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

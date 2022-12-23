@@ -138,6 +138,66 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 //3. Cập nhật bài post
 const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // upload.array("PhotosList", 6);
+        const { content } = req.body;
+        const files = req.files;
+        if (content.length === 0 && !files) {
+            return res.status(400).json({ msg: "Please add content or image." });
+        }
+        if (files) {
+            let listAttachment = [];
+            let attachmentId = [];
+            for (let file in files) {
+                const newAttachment = new Attachment_model_1.default({
+                    _id: new mongoose_1.default.Types.ObjectId(),
+                    name: files[file].filename,
+                    size: String(files[file].size),
+                    format_type: files[file].mimetype,
+                    type: 0,
+                    type_name: "Image"
+                });
+                yield newAttachment.save();
+                listAttachment.push(newAttachment);
+                attachmentId.push(newAttachment.id);
+            }
+            const newPost = new Post_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId(),
+                content: content,
+                attachment: attachmentId,
+                user: req.user['_id'],
+                time: (0, moment_1.default)(),
+            });
+            yield newPost.save().then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                if (result) {
+                    for (let item in listAttachment) {
+                        yield listAttachment[item].save();
+                        //------------------------------------------------
+                        cloudinary_1.default.v2.uploader.upload(files[item].path).then((result) => __awaiter(void 0, void 0, void 0, function* () {
+                            yield Attachment_model_1.default.findByIdAndUpdate({ _id: listAttachment[item]._id }, {
+                                link: result.url,
+                                user: req.user['_id'],
+                                res_model: "Post",
+                                res_id: newPost._id
+                            });
+                        }));
+                        //------------------------------------------------
+                    }
+                }
+            })).catch((error) => {
+                return res.status(500).json({ message: error.message });
+            });
+            res.json({ message: 'Success' });
+        }
+        else {
+            const newPost = yield new Post_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId(),
+                content: content,
+                user: req.user['_id'],
+                time: (0, moment_1.default)(),
+            });
+            yield newPost.save();
+            res.json({ message: 'Success' });
+        }
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

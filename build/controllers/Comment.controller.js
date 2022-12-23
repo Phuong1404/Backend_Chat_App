@@ -137,6 +137,12 @@ const unlikeComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 //5. xóa comment
 const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const comment = yield Comment_model_1.default.findOneAndDelete({
+            _id: req.params.id,
+        });
+        res.json({
+            message: "Deleted Post!"
+        });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
