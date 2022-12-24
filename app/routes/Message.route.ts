@@ -14,5 +14,5 @@ router.patch('/delete/:id', extractJWT, controller.deleteMessage)
 
 router.patch('/react/:id', extractJWT, controller.reactMessage)
 
-router.post('/read/:id', extractJWT, controller.getMessageInChannel)
+router.get('/read/:id', extractJWT, controller.getMessageInChannel)
 export = router

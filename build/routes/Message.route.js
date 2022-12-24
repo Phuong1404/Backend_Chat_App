@@ -12,6 +12,6 @@ router.post('/send/:id', extractJWT_1.default, uploadImage_1.default.single('fil
 router.patch('/remove/:id', extractJWT_1.default, Message_controller_1.default.removeMessage);
 router.patch('/delete/:id', extractJWT_1.default, Message_controller_1.default.deleteMessage);
 router.patch('/react/:id', extractJWT_1.default, Message_controller_1.default.reactMessage);
-router.post('/read/:id', extractJWT_1.default, Message_controller_1.default.getMessageInChannel);
+router.get('/read/:id', extractJWT_1.default, Message_controller_1.default.getMessageInChannel);
 module.exports = router;
 //# sourceMappingURL=Message.route.js.map
