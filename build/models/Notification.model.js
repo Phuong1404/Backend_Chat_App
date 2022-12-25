@@ -29,7 +29,10 @@ const NotifySchema = new mongoose_1.Schema({
         type: mongoose_1.default.Types.ObjectId,
         ref: "User"
     },
-    receiver: [mongoose_1.default.Types.ObjectId],
+    receiver: {
+        type: mongoose_1.default.Types.ObjectId,
+        ref: "User"
+    },
     url: String,
     text: String,
     content: String,

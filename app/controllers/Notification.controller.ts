@@ -5,15 +5,12 @@ import Notification from "../models/Notification.model";
 const createNotify = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { receiver, url, text, content, image } = req.body;
-
-        if (receiver.includes(req.user['_id'].toString())) return;
-
         const notify = await new Notification({
-            receiver,
-            url,
-            text,
-            content,
-            image,
+            receiver:receiver,
+            url:url,
+            text:text,
+            content:content,
+            image :image,
             user: req.user['_id'],
         });
         await notify.save();
@@ -39,7 +36,7 @@ const getNotify = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const notifies = await Notification.find({ receiver: req.user['_id'] })
             .sort("-createdAt")
-            .populate("user", "password");
+            .populate("user", "-password");
         return res.json({ notifies });
     } catch (error) {
         return res.status(500).json({ msg: error.message });

@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const users1 = [];
 const addUser = ({ id, user_id, room }) => {
+    console.log({ id, user_id, room });
     user_id = user_id.trim().toLowerCase();
     room = room.trim().toLowerCase();
-    const exstingUser = users1.find((user) => user.room === room && user.user_id === user_id);
-    if (exstingUser) {
-        return { error: 'User has taken' };
+    const exstingUser = users1.findIndex((user) => user.room === room && user.user_id === user_id);
+    if (exstingUser != -1) {
+        users1.splice(exstingUser, 1);
     }
     const user = { id, user_id, room };
     users1.push(user);
@@ -23,6 +24,8 @@ const removeUser = (id, room) => {
 };
 const getUser = (id, room) => {
     room = room.trim().toLowerCase();
+    console.log("user1", users1);
+    console.log("room id", room, id);
     const user = users1.find((user) => user.id === id && user.room === room);
     if (user) {
         return user;

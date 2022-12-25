@@ -7,7 +7,10 @@ const NotifySchema: Schema = new Schema(
             type: mongoose.Types.ObjectId,
             ref: "User"
         },
-        receiver: [mongoose.Types.ObjectId],
+        receiver: {
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        },
         url: String,
         text: String,
         content: String,

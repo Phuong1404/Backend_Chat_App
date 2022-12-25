@@ -16,14 +16,12 @@ const Notification_model_1 = __importDefault(require("../models/Notification.mod
 const createNotify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { receiver, url, text, content, image } = req.body;
-        if (receiver.includes(req.user['_id'].toString()))
-            return;
         const notify = yield new Notification_model_1.default({
-            receiver,
-            url,
-            text,
-            content,
-            image,
+            receiver: receiver,
+            url: url,
+            text: text,
+            content: content,
+            image: image,
             user: req.user['_id'],
         });
         yield notify.save();
@@ -49,7 +47,7 @@ const getNotify = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     try {
         const notifies = yield Notification_model_1.default.find({ receiver: req.user['_id'] })
             .sort("-createdAt")
-            .populate("user", "password");
+            .populate("user", "-password");
         return res.json({ notifies });
     }
     catch (error) {

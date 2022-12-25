@@ -15,38 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chat_socket_1 = __importDefault(require("./socket/chat.socket"));
 const Channel_model_1 = __importDefault(require("./models/Channel.model"));
 let users = [];
-// const EditData = (data, id, call) => {
-//     const newData = data.map((item) => {
-//         item.id === id ? { ...item, call } : item
-//     });
-//     return newData;
-// }
 const SocketServer = (socket, io) => {
     //connect -- disconnect
-    socket.on("userJoin", (user) => {
-        users.push({
+    socket.on("userJoin", (user) => __awaiter(void 0, void 0, void 0, function* () {
+        users = yield users.filter(user1 => user1.id != user._id);
+        yield users.push({
             id: user._id,
             socketId: socket.id,
             friend: user.friend
         });
         console.log(`User ${user._id} was connect socket`);
-    });
+        console.log(users);
+    }));
     //Chat socket
     socket.on('joinchat', ({ user_id, room }) => __awaiter(void 0, void 0, void 0, function* () {
-        const { error, user } = yield chat_socket_1.default.addUser({ id: socket.id, user_id, room });
-        if (!error) {
-            yield socket.join(user.room);
-            console.log(`User ${user_id} join room ${user.room}`);
-        }
+        const { user } = yield chat_socket_1.default.addUser({ id: socket.id, user_id, room });
+        yield socket.join(user.room);
+        console.log(`User ${user_id} join room ${user.room}`);
     }));
     //Message
     socket.on("sendMessage", ({ message, room }) => __awaiter(void 0, void 0, void 0, function* () {
         const user = chat_socket_1.default.getUser(socket.id, room);
         if (!user.error) {
-            let channel_user = yield Channel_model_1.default.findOne({ id: room })['user'];
+            let channel_user = yield Channel_model_1.default.findOne({ id: room });
             io.to(user.room).emit('message', { user: user.user_id, message: message });
-            for (let u in channel_user) {
-                const us = users.find((user) => user.id === channel_user[u]);
+            for (let u in channel_user.user) {
+                const us = users.find((user) => user.id === channel_user.user[u]);
                 if (us) {
                     socket.to(`${us.socketId}`).emit("channel message");
                 }
@@ -83,22 +77,17 @@ const SocketServer = (socket, io) => {
     socket.on('typing_to_server', function (sender, room, typing_status) {
         io.emit('typing_to_client', sender, room, typing_status);
     });
-    socket.on("disconnect", () => {
+    socket.on("disconnect", () => __awaiter(void 0, void 0, void 0, function* () {
         chat_socket_1.default.disconnectRoom(socket.id);
-        let u = users.findIndex((user) => user.socketId === socket.id);
-        if (u) {
-            users.splice(u, 1);
-        }
+        users = yield users.filter(user1 => user1.socketId != socket.id);
         console.log(`User ${socket.id} was disconnect socket`);
-    });
-    socket.on('disconnecting', (reason) => {
+    }));
+    socket.on('disconnecting', (reason) => __awaiter(void 0, void 0, void 0, function* () {
+        yield chat_socket_1.default.disconnectRoom(socket.id);
         chat_socket_1.default.disconnectRoom(socket.id);
-        let u = users.findIndex((user) => user.socketId === socket.id);
-        if (u) {
-            users.splice(u, 1);
-        }
+        users = yield users.filter(user1 => user1.socketId != socket.id);
         console.log(`User ${socket.id} disconnecting socket now`);
-    });
+    }));
     //Notifi tin nhắn
     //Notification
     socket.on("createNotify", (user_id, notify) => {
@@ -110,28 +99,46 @@ const SocketServer = (socket, io) => {
         user_receiver && socket.to(`${user_id}`).emit("deleteNotifyToClient", notify);
     });
     //like post
-    socket.on("likepost", ({ post, user }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user_post = users.find((user) => post.user == user.id);
-        console.log(user_post);
-        socket.to(`${user_post.socketId}`).emit("likepostclient", post, user);
+    socket.on("likepost", ({ post, user, status }) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(users);
+        if (users) {
+            const user_post = users.find((user1) => post.user._id == user1.id);
+            if (user_post && status == 1) {
+                socket.to(`${user_post.socketId}`).emit("likepostclient", post, user);
+            }
+        }
     }));
     //like comment
-    socket.on("likecomment", ({ post, user }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user_post = users.find((user) => post.user == user.id);
-        console.log(user_post);
-        socket.to(`${user_post.socketId}`).emit("likecommentclient", post, user);
+    socket.on("likecomment", ({ comment, user, status }) => __awaiter(void 0, void 0, void 0, function* () {
+        const user_comment = users.find((user1) => comment.user._id == user1.id);
+        console.log(user_comment);
+        if (user_comment && status == 1) {
+            socket.to(`${user_comment.socketId}`).emit("likecommentclient", comment, user);
+        }
     }));
     //bình luận post
     socket.on("comment", ({ post, comment, user }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user_post = users.find((user) => post.user == user.id);
+        const user_post = users.find((user1) => post.user._id == user1.id);
         console.log(user_post);
         socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
     }));
     //trả lời comment
     socket.on("replycomment", ({ comment, user }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user_comment = users.find((user) => comment.user == user.id);
+        const user_comment = users.find((user1) => comment.user._id == user1.id);
         console.log(user_comment);
         socket.to(`${user_comment.socketId}`).emit("replycommentpostclient", comment, user);
+    }));
+    //gửi lời mời kết bạn
+    socket.on("sendfriendrequest", ({ request, user }) => __awaiter(void 0, void 0, void 0, function* () {
+        const user_send = users.find((user1) => request.recever == user1.id);
+        console.log(user_send);
+        socket.to(`${user_send.socketId}`).emit("sendfriendrequestclient", request, user);
+    }));
+    //chấp nhận lời mời kết bạn
+    socket.on("acceptfriendrequest", ({ request, user }) => __awaiter(void 0, void 0, void 0, function* () {
+        const user_accept = users.find((user1) => request.sender == user1.id);
+        console.log(user_accept);
+        socket.to(`${user_accept.socketId}`).emit("acceptfriendrequest", request, user);
     }));
     // //Send friend request
     // socket.on("sendRequest", (msg) => {

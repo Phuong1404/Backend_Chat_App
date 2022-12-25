@@ -209,7 +209,7 @@ const readMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     for (let mess in messages) {
         let is_unread = messages[mess].unread.find(user => String(user) == String(req.user['_id']));
         if (is_unread) {
-            yield Message_model_1.default.findByIdAndUpdate({ _id: req.user['_id'] }, {
+            yield Message_model_1.default.findByIdAndUpdate({ _id: messages[mess]._id }, {
                 $pull: { unread: req.user['_id'] }
             });
         }
