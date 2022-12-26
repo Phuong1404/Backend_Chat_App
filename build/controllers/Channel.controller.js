@@ -181,33 +181,31 @@ const MyListChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             }
         }
         if (listChannel[i].num_member == 2) {
-            if (messchannel.length > 0) {
-                const user_id = listChannel[i].user.find(user => String(user) != String(req.user['_id']));
-                const user_channel = yield User_model_1.default.findOne({ _id: user_id });
-                let avatar = "";
-                if (user_channel) {
-                    if (user_channel.get('avatar')) {
-                        const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
-                        if (attachment) {
-                            avatar = attachment.link;
-                        }
+            const user_id = listChannel[i].user.find(user => String(user) != String(req.user['_id']));
+            const user_channel = yield User_model_1.default.findOne({ _id: user_id });
+            let avatar = "";
+            if (user_channel) {
+                if (user_channel.get('avatar')) {
+                    const attachment = yield Attachment_model_1.default.findOne({ _id: user_channel.avatar });
+                    if (attachment) {
+                        avatar = attachment.link;
                     }
-                    const val = {
-                        "_id": listChannel[i]._id,
-                        "name": user_channel.name,
-                        "avatar": avatar,
-                        "user": [{
-                                "_id": user_channel._id,
-                                "name": user_channel.name,
-                                "avatar": avatar
-                            }],
-                        "num_member": listChannel[i].num_member,
-                        "unread": mess_unread,
-                        "last_message_time": lasttime,
-                        "last_message": last_mess,
-                    };
-                    ListValue.push(val);
                 }
+                const val = {
+                    "_id": listChannel[i]._id,
+                    "name": user_channel.name,
+                    "avatar": avatar,
+                    "user": [{
+                            "_id": user_channel._id,
+                            "name": user_channel.name,
+                            "avatar": avatar
+                        }],
+                    "num_member": listChannel[i].num_member,
+                    "unread": mess_unread,
+                    "last_message_time": lasttime,
+                    "last_message": last_mess,
+                };
+                ListValue.push(val);
             }
         }
         else {
