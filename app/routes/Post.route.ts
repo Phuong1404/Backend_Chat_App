@@ -6,7 +6,7 @@ import uploadImage from '../middleware/uploadImage'
 
 router.post('/', extractJWT, uploadImage.array("files", 6), controller.createPost)
 router.get('/', extractJWT, controller.getPosts)
-router.patch('/:id', extractJWT, controller.updatePost)
+router.patch('/:id', extractJWT,uploadImage.array("files", 6), controller.updatePost)
 router.get('/:id', extractJWT, controller.getPost)
 router.delete('/:id', extractJWT, controller.deletePost)
 router.post('/savepost/:id', extractJWT, controller.savePost)
