@@ -157,11 +157,18 @@ const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post_id = req.params.id;
-        const comment = yield Comment_model_1.default.find({
+        const comment1 = yield Comment_model_1.default.find({
             post_id: post_id
         })
             .populate("attachment")
             .populate("user", "_id name avatar");
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const comment = yield Comment_model_1.default.populate(comment1, populateQuery);
         res.json({
             result: comment.length,
             comment,

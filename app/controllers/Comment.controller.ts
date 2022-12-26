@@ -99,7 +99,7 @@ const updateComment = async (req: Request, res: Response, next: NextFunction) =>
         const comment = await Comment.findByIdAndUpdate({ _id: req.params.id }, {
             content: content
         })
-        res.json({message:"Done"})
+        res.json({ message: "Done" })
 
     }
     catch (err) {
@@ -154,11 +154,19 @@ const deleteComment = async (req: Request, res: Response, next: NextFunction) =>
 const getComments = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const post_id = req.params.id
-        const comment = await Comment.find({
+        const comment1 = await Comment.find({
             post_id: post_id
         })
             .populate("attachment")
             .populate("user", "_id name avatar")
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+
+        ];
+        const comment= await Comment.populate(comment1,populateQuery)
         res.json({
             result: comment.length,
             comment,

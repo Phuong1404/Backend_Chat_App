@@ -22,11 +22,20 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" })
         }
-        const message = await Message.find({ channel: String(channel_id) })
+        const message1 = await Message.find({ channel: String(channel_id) })
             .sort("-createdAt")
             .populate("attachment")
+            .populate("user", "_id name avatar")
             .skip(skip)
             .limit(limit)
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+
+        ];
+        const message = await Message.populate(message1, populateQuery)
         const List_Message = []
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']))
@@ -34,6 +43,7 @@ const getMessageInChannel = async (req: Request, res: Response, next: NextFuncti
                 List_Message.push(message[mess])
             }
         }
+
         res.json({ data: List_Message })
     }
     catch (error) {

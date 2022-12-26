@@ -33,11 +33,19 @@ const getMessageInChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
         if (!is_MyChannel) {
             res.status(400).json({ message: "This not your channel" });
         }
-        const message = yield Message_model_1.default.find({ channel: String(channel_id) })
+        const message1 = yield Message_model_1.default.find({ channel: String(channel_id) })
             .sort("-createdAt")
             .populate("attachment")
+            .populate("user", "_id name avatar")
             .skip(skip)
             .limit(limit);
+        const populateQuery = [
+            {
+                path: 'user.avatar',
+                select: '-_id link',
+            },
+        ];
+        const message = yield Message_model_1.default.populate(message1, populateQuery);
         const List_Message = [];
         for (let mess in message) {
             let is_delete = message[mess].invisible_to.find(user => String(user) == String(req.user['_id']));
