@@ -18,19 +18,16 @@ const PostSchema: Schema = new Schema(
         //         emoji: { type: String }
         //     }
         // ],
-        react: [
-            {
-                type: mongoose.Types.ObjectId,
-                ref: "User"
-            }
-
-        ],
+        react: [{ type: mongoose.Types.ObjectId, ref: "User" }],
         comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
         attachment: [{ type: mongoose.Types.ObjectId, ref: "Attachment" }],
         total_react: { type: Number },
         status: { type: Number },
         status_type: { type: String },
-
+        isnotify: { type: Boolean },
+        ispublic: { type: Boolean },
+        share: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+        post_share:[{ type: mongoose.Types.ObjectId, ref: "Post" }]
     }
     ,
     {

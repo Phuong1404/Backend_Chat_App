@@ -32,6 +32,10 @@ const ChannelSchema = new mongoose_1.Schema({
     user_create: { type: String },
     user_update: { type: String },
     num_member: { type: Number },
+    admin: [{
+            type: mongoose_1.default.Types.ObjectId,
+            ref: "User"
+        }],
     user: [{
             type: mongoose_1.default.Types.ObjectId,
             ref: "User"
@@ -39,7 +43,8 @@ const ChannelSchema = new mongoose_1.Schema({
     attachment: [{
             type: mongoose_1.default.Types.ObjectId,
             ref: "Attachment"
-        }]
+        }],
+    is_create: { type: Boolean },
 }, {
     timestamps: true,
 });

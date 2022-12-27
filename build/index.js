@@ -18,6 +18,8 @@ const Message_route_1 = __importDefault(require("./routes/Message.route"));
 const Notification_route_1 = __importDefault(require("./routes/Notification.route"));
 const Post_route_1 = __importDefault(require("./routes/Post.route"));
 const Comment_route_1 = __importDefault(require("./routes/Comment.route"));
+const SavePost_route_1 = __importDefault(require("./routes/SavePost.route"));
+const shortcut_route_1 = __importDefault(require("./routes/shortcut.route"));
 const cors_1 = __importDefault(require("cors"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const socketServer_1 = __importDefault(require("./socketServer"));
@@ -31,6 +33,7 @@ require('./models/Notification.model');
 require('./models/Post.model');
 require('./models/SavePost.model');
 require('./models/Comment.model');
+require('./models/shortcut.model');
 //------------------------------------
 const NAMESPACE = 'Server';
 const app = (0, express_1.default)();
@@ -90,6 +93,8 @@ app.use('/message', Message_route_1.default);
 app.use('/notify', Notification_route_1.default);
 app.use('/post', Post_route_1.default);
 app.use('/comment', Comment_route_1.default);
+app.use('/savepost', SavePost_route_1.default);
+app.use('/shortcutRoutes', shortcut_route_1.default);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

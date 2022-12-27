@@ -4,6 +4,7 @@ import User from '../models/User.model'
 import Post from "../models/Post.model";
 import Comment from "../models/Comment.model";
 import Attachment from '../models/Attachment.model'
+import SavePost from "../models/SavePost.model";
 import moment from "moment";
 import cloudinary from 'cloudinary'
 const NAMESPACE = "POST"
@@ -12,7 +13,7 @@ const NAMESPACE = "POST"
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // upload.array("PhotosList", 6);
-        const { content } = req.body
+        const { content, ispublic } = req.body
         const files = req.files
         if (content.length === 0 && !files) {
             return res.status(400).json({ msg: "Please add content or image." });
@@ -38,7 +39,11 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
                 content: content,
                 attachment: attachmentId,
                 user: req.user['_id'],
+                ispublic: ispublic,
+                isnotify: true,
                 time: moment(),
+                status: 1,
+                status_type: "post"
             })
 
             await newPost.save().then(async (result) => {
@@ -95,7 +100,13 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
                 select: '-_id link',
             },
         ];
-        const post1 = await Post.populate(post, populateQuery);
+        const post2 = await Post.populate(post, populateQuery);
+        let post1 = []
+        for (let i in post2) {
+            if (post2[i].ispublic) {
+                post1.push(post2[i])
+            }
+        }
         res.json({
             result: post1.length,
             post1,
@@ -119,7 +130,19 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
                 select: '-_id link',
             },
         ];
-        const post1 = await Post.populate(post, populateQuery);
+        const post2 = await Post.populate(post, populateQuery);
+        let post1 = []
+        console.log(String(user_id) == String(req.user['_id']))
+        if (String(user_id) == String(req.user['_id'])) {
+            post1 = post2
+        }
+        else {
+            for (let i in post2) {
+                if (post2[i].ispublic) {
+                    post1.push(post2[i])
+                }
+            }
+        }
         res.json({
             result: post1.length,
             post1,
@@ -133,7 +156,7 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const { content, file_delete } = req.body
-        
+
         const post = await Post.findById(req.params.id)
         //Bỏ những file bị bỏ đi
         const new_attachment = post.attachment.filter(item => !file_delete.includes(item));
@@ -238,7 +261,15 @@ const deletePost = async (req: Request, res: Response, next: NextFunction) => {
             _id: req.params.id,
         });
         await Comment.deleteMany({ _id: { $in: post.comments } });
+        await Attachment.deleteMany({ _id: { $in: post.attachment } })
 
+        const listSavePost = await SavePost.find({ post: req.params.id })
+        for (let i in listSavePost) {
+            await SavePost.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                status: 3,
+                status_type: 'delete'
+            })
+        }
         res.json({
             message: "Deleted Post!"
         });
@@ -268,13 +299,68 @@ const unSavePost = async (req: Request, res: Response, next: NextFunction) => {
 //11. Lấy danh sách lưu
 const getSavePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { content } = req.body
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+//12. Tắt thông báo bài viết
+const changeNotify = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const { isnotify } = req.body
+        await Post.findByIdAndUpdate({ _id: req.params.id, }, {
+            "isnotify": isnotify
+        })
+        return res.json({ 'message': "Done" })
 
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
     }
 }
+//13. Chuyển chế độ bài viết
+const changePermisstion = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { ispublic } = req.body
+        await Post.findByIdAndUpdate({ _id: req.params.id, }, {
+            "ispublic": ispublic
+        })
+        const listSavePost = await SavePost.find({ post: req.params.id })
+        console.log(listSavePost)
+        if (ispublic == true) {
+            for (let i in listSavePost) {
+                await SavePost.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                    status: 1,
+                    status_type: 'save'
+                })
+            }
+        }
+        else {
+            for (let i in listSavePost) {
+                await SavePost.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                    status: 2,
+                    status_type: 'private'
+                })
+            }
+        }
+        return res.json({ 'message': "Done" })
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+//14. Share bài viết
+const SharePost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
 export default {
     createPost, getPosts, updatePost, getPost, reactPost,
-    deletePost, savePost, unSavePost, getSavePost, getPostsUser
+    deletePost, savePost, unSavePost, getSavePost, getPostsUser,
+    changeNotify, changePermisstion
 }

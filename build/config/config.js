@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
+const nodemailer_1 = __importDefault(require("nodemailer"));
 require('dotenv').config();
 const MONGO_OPTIONS = {
     useUnifiedTopology: true,
@@ -10,6 +14,17 @@ const MONGO_OPTIONS = {
     autoIndex: false,
     retryWrites: true
 };
+const transporter = nodemailer_1.default.createTransport({
+    service: 'hotmail',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    auth: {
+        user: 't.xuanphuong1404@outlook.com',
+        pass: 'phuong1404',
+    },
+    logger: true
+});
 //Data deploy
 const MONGO_USERNAME = 'phuong_1404';
 const MONGO_PASSWORD = '14042001Aa';
@@ -45,6 +60,7 @@ const SERVER = {
 const config = {
     mongo: MONGO,
     server: SERVER,
+    mail: transporter
 };
 exports.default = config;
 //# sourceMappingURL=config.js.map

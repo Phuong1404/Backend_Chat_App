@@ -13,4 +13,9 @@ export default interface IPost extends Document {
     status_type: string;
     page_id: string;
     group_id: string;
+    isnotify: Boolean;
+    ispublic: Boolean;
+    share: [Object];
+    url: string;
+    post_share:[Object]
 }

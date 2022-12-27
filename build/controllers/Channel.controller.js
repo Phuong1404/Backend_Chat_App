@@ -32,7 +32,8 @@ const createChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         _id: new mongoose_1.default.Types.ObjectId(),
         name: name,
         user: user_channel,
-        num_member: user_channel.length
+        num_member: user_channel.length,
+        admin: [req.user['_id']]
     });
     yield newChannel.save();
     for (let user in user_channel) {
@@ -52,6 +53,10 @@ const addUserToChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']));
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" });
+    }
+    const is_admin = channel.admin.find(user => String(user) == String(req.user['_id']));
+    if (!is_admin) {
+        res.status(400).json({ message: "You done have perrmission" });
     }
     const { list_user } = req.body;
     let user_channel = [];
@@ -83,8 +88,16 @@ const removeUserToChannel = (req, res, next) => __awaiter(void 0, void 0, void 0
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" });
     }
+    const is_admin = channel.admin.find(user => String(user) == String(req.user['_id']));
+    if (!is_admin) {
+        res.status(400).json({ message: "Bạn không có quyền thực hiện" });
+    }
     const { list_user } = req.body;
     let user_channel = [];
+    let is_create = list_user.find(user1 => String(user1) == String(channel._id));
+    if (is_create) {
+        res.status(400).json({ message: "Bạn không thể xóa người dùng là admin" });
+    }
     for (let user in list_user) {
         let is_In_Channel = channel.user.find(user1 => String(user1) == String(list_user[user]));
         if (is_In_Channel) {
@@ -113,6 +126,10 @@ const updateChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']));
     if (!is_MyChannel) {
         res.status(400).json({ message: "This not your channel" });
+    }
+    const is_admin = channel.admin.find(user => String(user) == String(req.user['_id']));
+    if (!is_admin) {
+        res.status(400).json({ message: "Bạn không đủ quyền thực hiện" });
     }
     yield Channel_model_1.default.findByIdAndUpdate({ _id: channel_id }, {
         name: name,
@@ -144,14 +161,18 @@ const leaveChannel = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     const channel_id = req.params.id;
     const channel = yield Channel_model_1.default.findById(channel_id);
     if (!channel) {
-        return res.status(400).json({ message: "Channel not found" });
+        return res.status(400).json({ message: "Channel không tồn tại" });
     }
     const is_MyChannel = channel.user.find(user => String(user) == String(req.user['_id']));
     if (!is_MyChannel) {
-        res.status(400).json({ message: "This not your channel" });
+        res.status(400).json({ message: "Không phải channel của bạn" });
     }
     if (channel.num_member <= 2) {
-        res.status(400).json({ message: "You cannot leave channel" });
+        res.status(400).json({ message: "Không thể rời channel" });
+    }
+    const is_admin = channel.admin.find(user => String(user) == String(req.user['_id']));
+    if (is_admin && channel.admin.length == 1) {
+        res.status(400).json({ message: "Hãy chỉ định admin mới trước khi rời" });
     }
     yield Channel_model_1.default.findByIdAndUpdate({ _id: channel_id }, {
         $pull: { user: req.user['_id'] },

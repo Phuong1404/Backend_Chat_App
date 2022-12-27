@@ -142,16 +142,19 @@ const ListRequestRequest = (req, res, next) => __awaiter(void 0, void 0, void 0,
 //6. Xóa bạn bè
 const DeleteFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     //Tìm danh sách channel
-    // const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    const channel = yield Channel_model_1.default.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }, { num_member: 2 }] });
+    yield Channel_model_1.default.findByIdAndRemove({ _id: channel._id });
     const user = yield User_model_1.default.findById(req.user['_id']);
     if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
         return res.status(400).json({ message: "Not friends" });
     }
     //xóa bạn bè 
-    yield User_model_1.default.findOneAndUpdate({ id: req.user['_id'] }, {
+    yield User_model_1.default.findByIdAndUpdate({ _id: req.user['_id'] }, {
         $pull: { friend: req.params.id }
     });
-    yield User_model_1.default.findOneAndUpdate({ id: req.params.id }, {
+    console.log(req.params.id);
+    console.log(req.user['_id']);
+    yield User_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
         $pull: { friend: req.user['_id'] }
     });
     //Tìm friend request
@@ -159,7 +162,7 @@ const DeleteFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     if (request) {
         yield FriendRequest_model_1.default.findByIdAndDelete({ _id: request._id });
     }
-    res.json("Delete success");
+    res.json({ "message": "Delete success" });
 });
 exports.default = {
     sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest, DeleteFriend

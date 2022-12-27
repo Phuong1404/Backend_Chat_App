@@ -24,34 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const PostSchema = new mongoose_1.Schema({
-    content: { type: String },
-    time: { type: Date },
+const ShortcutSchema = new mongoose_1.Schema({
     user: {
         type: mongoose_1.default.Types.ObjectId,
         ref: "User"
     },
-    // react: [
-    //     {
-    //         user: {
-    //             type: mongoose.Types.ObjectId,
-    //             ref: "User"
-    //         },
-    //         emoji: { type: String }
-    //     }
-    // ],
-    react: [{ type: mongoose_1.default.Types.ObjectId, ref: "User" }],
-    comments: [{ type: mongoose_1.default.Types.ObjectId, ref: "Comment" }],
-    attachment: [{ type: mongoose_1.default.Types.ObjectId, ref: "Attachment" }],
-    total_react: { type: Number },
-    status: { type: Number },
-    status_type: { type: String },
-    isnotify: { type: Boolean },
-    ispublic: { type: Boolean },
-    share: [{ type: mongoose_1.default.Types.ObjectId, ref: "User" }],
-    post_share: [{ type: mongoose_1.default.Types.ObjectId, ref: "Post" }]
+    shortcut: {
+        type: mongoose_1.default.Types.ObjectId,
+        ref: "User"
+    }
 }, {
-    timestamps: true,
+    timestamps: true
 });
-exports.default = mongoose_1.default.model("Post", PostSchema);
-//# sourceMappingURL=Post.model.js.map
+exports.default = mongoose_1.default.model("Shortcut", ShortcutSchema);
+//# sourceMappingURL=shortcut.model.js.map

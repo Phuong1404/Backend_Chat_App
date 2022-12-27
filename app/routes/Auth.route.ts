@@ -1,4 +1,4 @@
-import  express from 'express'
+import express from 'express'
 import controller from '../controllers/Auth.controller'
 const router = express.Router();
 import extractJWT from '../middleware/extractJWT';
@@ -14,4 +14,5 @@ router.post("/refresh_token", controller.GenerateAccessToken);
 
 router.patch("/changepass", extractJWT, controller.ChangePass)
 
+router.post("/resetpass", controller.ResetPassword)
 export = router;

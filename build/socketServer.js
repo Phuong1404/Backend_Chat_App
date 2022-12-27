@@ -52,14 +52,7 @@ const SocketServer = (socket, io) => {
     socket.on("deleteChat", ({ message, room }) => __awaiter(void 0, void 0, void 0, function* () {
         const user = chat_socket_1.default.getUser(socket.id, room);
         if (!user.error) {
-            // let channel_user = await Channel.findOne({ id: room })['user']
-            io.to(user.room).emit('message', { user: user.user_id, message: message });
-            // for (let u in channel_user) {
-            //     const us = users.find((user) => user.id === channel_user[u])
-            //     if (us) {
-            //         socket.to(`${us.socketId}`).emit("channel message");
-            //     }
-            // }
+            io.to(user.room).emit('deletemessage', { user: user.user_id, message: message });
             console.log("send success");
         }
         console.log("send fail");

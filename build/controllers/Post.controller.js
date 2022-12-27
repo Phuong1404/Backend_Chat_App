@@ -16,6 +16,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Post_model_1 = __importDefault(require("../models/Post.model"));
 const Comment_model_1 = __importDefault(require("../models/Comment.model"));
 const Attachment_model_1 = __importDefault(require("../models/Attachment.model"));
+const SavePost_model_1 = __importDefault(require("../models/SavePost.model"));
 const moment_1 = __importDefault(require("moment"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
 const NAMESPACE = "POST";
@@ -23,7 +24,7 @@ const NAMESPACE = "POST";
 const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // upload.array("PhotosList", 6);
-        const { content } = req.body;
+        const { content, ispublic } = req.body;
         const files = req.files;
         if (content.length === 0 && !files) {
             return res.status(400).json({ msg: "Please add content or image." });
@@ -49,7 +50,11 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 content: content,
                 attachment: attachmentId,
                 user: req.user['_id'],
+                ispublic: ispublic,
+                isnotify: true,
                 time: (0, moment_1.default)(),
+                status: 1,
+                status_type: "post"
             });
             yield newPost.save().then((result) => __awaiter(void 0, void 0, void 0, function* () {
                 if (result) {
@@ -101,7 +106,13 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
                 select: '-_id link',
             },
         ];
-        const post1 = yield Post_model_1.default.populate(post, populateQuery);
+        const post2 = yield Post_model_1.default.populate(post, populateQuery);
+        let post1 = [];
+        for (let i in post2) {
+            if (post2[i].ispublic) {
+                post1.push(post2[i]);
+            }
+        }
         res.json({
             result: post1.length,
             post1,
@@ -125,7 +136,19 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 select: '-_id link',
             },
         ];
-        const post1 = yield Post_model_1.default.populate(post, populateQuery);
+        const post2 = yield Post_model_1.default.populate(post, populateQuery);
+        let post1 = [];
+        console.log(String(user_id) == String(req.user['_id']));
+        if (String(user_id) == String(req.user['_id'])) {
+            post1 = post2;
+        }
+        else {
+            for (let i in post2) {
+                if (post2[i].ispublic) {
+                    post1.push(post2[i]);
+                }
+            }
+        }
         res.json({
             result: post1.length,
             post1,
@@ -237,6 +260,14 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             _id: req.params.id,
         });
         yield Comment_model_1.default.deleteMany({ _id: { $in: post.comments } });
+        yield Attachment_model_1.default.deleteMany({ _id: { $in: post.attachment } });
+        const listSavePost = yield SavePost_model_1.default.find({ post: req.params.id });
+        for (let i in listSavePost) {
+            yield SavePost_model_1.default.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                status: 3,
+                status_type: 'delete'
+            });
+        }
         res.json({
             message: "Deleted Post!"
         });
@@ -264,6 +295,59 @@ const unSavePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 //11. Lấy danh sách lưu
 const getSavePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { content } = req.body;
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+//12. Tắt thông báo bài viết
+const changeNotify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { isnotify } = req.body;
+        yield Post_model_1.default.findByIdAndUpdate({ _id: req.params.id, }, {
+            "isnotify": isnotify
+        });
+        return res.json({ 'message': "Done" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+//13. Chuyển chế độ bài viết
+const changePermisstion = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { ispublic } = req.body;
+        yield Post_model_1.default.findByIdAndUpdate({ _id: req.params.id, }, {
+            "ispublic": ispublic
+        });
+        const listSavePost = yield SavePost_model_1.default.find({ post: req.params.id });
+        console.log(listSavePost);
+        if (ispublic == true) {
+            for (let i in listSavePost) {
+                yield SavePost_model_1.default.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                    status: 1,
+                    status_type: 'save'
+                });
+            }
+        }
+        else {
+            for (let i in listSavePost) {
+                yield SavePost_model_1.default.findByIdAndUpdate({ _id: listSavePost[i]._id }, {
+                    status: 2,
+                    status_type: 'private'
+                });
+            }
+        }
+        return res.json({ 'message': "Done" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
+//14. Share bài viết
+const SharePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
     }
     catch (err) {
         return res.status(500).json({ message: err.message });
@@ -271,6 +355,7 @@ const getSavePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.default = {
     createPost, getPosts, updatePost, getPost, reactPost,
-    deletePost, savePost, unSavePost, getSavePost, getPostsUser
+    deletePost, savePost, unSavePost, getSavePost, getPostsUser,
+    changeNotify, changePermisstion
 };
 //# sourceMappingURL=Post.controller.js.map

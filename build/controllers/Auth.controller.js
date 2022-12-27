@@ -226,7 +226,36 @@ const ChangePass = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: error.message });
     }
 });
+const ResetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, phone } = req.body;
+    const User1 = yield User_model_1.default.findOne({ email: email, phone: phone });
+    if (!User1) {
+        res.status(404).json({ 'message': 'Người dùng không tồn tại' });
+    }
+    else {
+        let new_pass = generatePassword();
+        yield User_model_1.default.findByIdAndUpdate({ _id: User1._id }, {
+            password: yield bcrypt_1.default.hash(new_pass, 12)
+        });
+        const info = yield config_1.default.mail.sendMail({
+            from: 't.xuanphuong1404@outlook.com',
+            to: email,
+            subject: "Social Network - Đặt lại mật khẩu",
+            html: `<strong>Mật khẩu mới của bạn là ${new_pass}</strong>`,
+            headers: { 'x-myheader': 'test header' }
+        });
+        console.log("Message sent: %s", info.response);
+        res.json({ 'message': 'success' });
+    }
+});
+const generatePassword = () => {
+    var length = 12, charset = "@#$&*0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$&*0123456789abcdefghijklmnopqrstuvwxyz", password = "";
+    for (var i = 0, n = charset.length; i < length; ++i) {
+        password += charset.charAt(Math.floor(Math.random() * n));
+    }
+    return password;
+};
 exports.default = {
-    Register, Login, GenerateAccessToken, Logout, ChangePass
+    Register, Login, GenerateAccessToken, Logout, ChangePass, ResetPassword
 };
 //# sourceMappingURL=Auth.controller.js.map

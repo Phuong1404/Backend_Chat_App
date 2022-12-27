@@ -1,4 +1,7 @@
 import 'dotenv/config'
+import nodemailer from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
+
 
 require('dotenv').config()
 
@@ -10,6 +13,19 @@ const MONGO_OPTIONS = {
     autoIndex: false,
     retryWrites: true
 };
+
+const transporter = nodemailer.createTransport({
+    service: 'hotmail',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    auth: {
+        user: 't.xuanphuong1404@outlook.com',
+        pass: 'phuong1404',
+    },
+    logger: true
+});
+
 //Data deploy
 const MONGO_USERNAME = 'phuong_1404';
 const MONGO_PASSWORD = '14042001Aa';
@@ -51,6 +67,7 @@ const SERVER = {
 const config = {
     mongo: MONGO,
     server: SERVER,
+    mail:transporter
 };
 
 export default config;

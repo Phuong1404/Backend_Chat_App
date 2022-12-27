@@ -225,8 +225,21 @@ const allUserNotFriend = async (req: Request, res: Response, next: NextFunction)
     });
 }
 const getListImageUser = async (req: Request, res: Response, next: NextFunction) => {
-    const list_Image = await Attachment.find({ $and: [{ user: req.user['_id'] }, { 'res_model': 'Post' }] })
-    .sort("-createdAt")
+    const user_id = req.params.id
+    const list_Image1 = await Attachment.find({ $and: [{ user: user_id }, { 'res_model': 'Post' }] })
+        .sort("-createdAt")
+    let list_Image = []
+    if (String(user_id) == String(req.user['_id'])) {
+        list_Image = list_Image1
+    }
+    else {
+        for (let i in list_Image1) {
+            let temp = await Post.findById(list_Image1[i])
+            if (temp.ispublic) {
+                list_Image.push(list_Image1[i])
+            }
+        }
+    }
     return res.json({
         list_Image,
         result: list_Image.length,

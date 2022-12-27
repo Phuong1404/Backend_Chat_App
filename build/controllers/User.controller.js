@@ -231,8 +231,21 @@ const allUserNotFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     });
 });
 const getListImageUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const list_Image = yield Attachment_model_1.default.find({ $and: [{ user: req.user['_id'] }, { 'res_model': 'Post' }] })
+    const user_id = req.params.id;
+    const list_Image1 = yield Attachment_model_1.default.find({ $and: [{ user: user_id }, { 'res_model': 'Post' }] })
         .sort("-createdAt");
+    let list_Image = [];
+    if (String(user_id) == String(req.user['_id'])) {
+        list_Image = list_Image1;
+    }
+    else {
+        for (let i in list_Image1) {
+            let temp = yield Post_model_1.default.findById(list_Image1[i]);
+            if (temp.ispublic) {
+                list_Image.push(list_Image1[i]);
+            }
+        }
+    }
     return res.json({
         list_Image,
         result: list_Image.length,

@@ -11,4 +11,6 @@ export default interface IChannel extends Document {
     attachment: [Object];
     alarm: [Object];
     role: [Object];
+    admin:[Object];
+    is_create:Boolean;
 }

@@ -155,16 +155,19 @@ const ListRequestRequest = async (req: Request, res: Response, next: NextFunctio
 //6. Xóa bạn bè
 const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => {
     //Tìm danh sách channel
-    // const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    await Channel.findByIdAndRemove({_id:channel._id})
     const user = await User.findById(req.user['_id'])
     if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
         return res.status(400).json({ message: "Not friends" });
     }
     //xóa bạn bè 
-    await User.findOneAndUpdate({ id: req.user['_id'] }, {
+    await User.findByIdAndUpdate({ _id: req.user['_id'] }, {
         $pull: { friend: req.params.id }
     })
-    await User.findOneAndUpdate({ id: req.params.id }, {
+    console.log(req.params.id)
+    console.log(req.user['_id'])
+    await User.findByIdAndUpdate({ _id: req.params.id }, {
         $pull: { friend: req.user['_id'] }
     })
     //Tìm friend request
@@ -172,7 +175,7 @@ const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => 
     if (request) {
         await FriendRequest.findByIdAndDelete({ _id: request._id })
     }
-    res.json("Delete success")
+    res.json({"message":"Delete success"})
 }
 export default {
     sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest,DeleteFriend

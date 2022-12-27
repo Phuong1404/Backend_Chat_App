@@ -13,10 +13,12 @@ import messageRoutes from './routes/Message.route'
 import notifyRoutes from './routes/Notification.route'
 import postRoutes from './routes/Post.route'
 import commentRoutes from './routes/Comment.route'
+import savePostRoutes from './routes/SavePost.route'
+import shortcutRoutes from './routes/shortcut.route'
 import path from 'path'
 import cors from 'cors';
-import  cloudinary from 'cloudinary'
-import  socketio from "socket.io"
+import cloudinary from 'cloudinary'
+import socketio from "socket.io"
 import SocketServer from "./socketServer"
 //------------------------------------
 require('./models/Channel.model')
@@ -28,6 +30,7 @@ require('./models/Notification.model')
 require('./models/Post.model')
 require('./models/SavePost.model')
 require('./models/Comment.model')
+require('./models/shortcut.model')
 //------------------------------------
 
 const NAMESPACE = 'Server';
@@ -97,6 +100,8 @@ app.use('/message', messageRoutes)
 app.use('/notify', notifyRoutes)
 app.use('/post', postRoutes)
 app.use('/comment', commentRoutes)
+app.use('/savepost', savePostRoutes)
+app.use('/shortcutRoutes', shortcutRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');
