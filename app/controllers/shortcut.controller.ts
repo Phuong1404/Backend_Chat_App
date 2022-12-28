@@ -11,10 +11,11 @@ const createShortcut = async (req: Request, res: Response, next: NextFunction) =
         if(String(req.user['_id'])==String(shortcut)){
             res.json({"message":"Done"})
         }
-        const short1=await ShortCut.findOne({'shortcut':shortcut})
+        const short1=await ShortCut.findOne({shortcut:shortcut,user:req.user['_id']})
+        console.log(short1)
         if(short1)
         {
-            await ShortCut.findByIdAndDelete(shortcut)
+            await ShortCut.findByIdAndDelete(short1._id)
         }
         let newShortcut = new ShortCut({
             _id: new mongoose.Types.ObjectId(),

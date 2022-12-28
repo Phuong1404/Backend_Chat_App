@@ -106,6 +106,12 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
             if (post2[i].ispublic) {
                 post1.push(post2[i])
             }
+            else {
+                if (String(post2[i].user) == String(req.user['_id'])) {
+                    post1.push(post2[i])
+                }
+            }
+
         }
         res.json({
             result: post1.length,
@@ -159,7 +165,8 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
 
         const post = await Post.findById(req.params.id)
         //Bỏ những file bị bỏ đi
-        const new_attachment = post.attachment.filter(item => !file_delete.includes(item));
+        let new_attachment = post.attachment.filter(item => !file_delete.includes(item));
+
 
         const files = req.files
         if (content.length === 0 && !files) {
@@ -182,11 +189,11 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
                 })
                 await newAttachment.save()
                 listAttachment.push(newAttachment)
-                new_attachment.push(newAttachment.id)
+                new_attachment.push(newAttachment._id)
             }
-
             await Post.findByIdAndUpdate({ _id: req.params.id }, {
-                content: Content
+                content: Content,
+                attachment: new_attachment
             }).then(async (result) => {
                 if (result) {
                     for (let item in listAttachment) {

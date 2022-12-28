@@ -6,14 +6,14 @@ let users = []
 
 const SocketServer = (socket, io) => {
     //connect -- disconnect
-    socket.on("userJoin", async(user) => {
-        users= await users.filter(user1=>user1.id!=user._id)
+    socket.on("userJoin", async (user) => {
+        users = await users.filter(user1 => user1.id != user._id)
         await users.push({
             id: user._id,
             socketId: socket.id,
             friend: user.friend
         })
-        
+
         console.log(`User ${user._id} was connect socket`)
         console.log(users)
     })
@@ -21,8 +21,8 @@ const SocketServer = (socket, io) => {
     //Chat socket
     socket.on('joinchat', async ({ user_id, room }) => {
         const { user } = await chatsocket.addUser({ id: socket.id, user_id, room })
-            await socket.join(user.room)
-            console.log(`User ${user_id} join room ${user.room}`)
+        await socket.join(user.room)
+        console.log(`User ${user_id} join room ${user.room}`)
     })
     //Message
     socket.on("sendMessage", async ({ message, room }) => {
@@ -45,7 +45,7 @@ const SocketServer = (socket, io) => {
         const user = chatsocket.getUser(socket.id, room)
         if (!user.error) {
             io.to(user.room).emit('deletemessage', { user: user.user_id, message: message })
-            
+
             console.log("send success")
         }
         console.log("send fail")
@@ -64,16 +64,16 @@ const SocketServer = (socket, io) => {
         io.emit('typing_to_client', sender, room, typing_status);
     });
 
-    socket.on("disconnect", async() => {
+    socket.on("disconnect", async () => {
         chatsocket.disconnectRoom(socket.id)
-        users= await users.filter(user1=>user1.socketId!=socket.id)
+        users = await users.filter(user1 => user1.socketId != socket.id)
         console.log(`User ${socket.id} was disconnect socket`)
     })
 
-    socket.on('disconnecting', async(reason) => {
+    socket.on('disconnecting', async (reason) => {
         await chatsocket.disconnectRoom(socket.id)
         chatsocket.disconnectRoom(socket.id)
-        users= await users.filter(user1=>user1.socketId!=socket.id)
+        users = await users.filter(user1 => user1.socketId != socket.id)
         console.log(`User ${socket.id} disconnecting socket now`)
     });
     //Notifi tin nhắn
@@ -88,21 +88,21 @@ const SocketServer = (socket, io) => {
         user_receiver && socket.to(`${user_id}`).emit("deleteNotifyToClient", notify);
     })
     //like post
-    socket.on("likepost", async ({ post, user,status }) => {
+    socket.on("likepost", async ({ post, user, status }) => {
         console.log(users)
-        if(users){
+        if (users) {
             const user_post = users.find((user1) => post.user._id == user1.id);
-            if(user_post && status==1){
+            if (user_post && status == 1 && post.isnotify == true) {
                 socket.to(`${user_post.socketId}`).emit("likepostclient", post, user);
             }
-            
+
         }
     })
     //like comment
-    socket.on("likecomment", async ({ comment, user,status }) => {
+    socket.on("likecomment", async ({ comment, user, status }) => {
         const user_comment = users.find((user1) => comment.user._id == user1.id);
         console.log(user_comment)
-        if(user_comment && status==1){
+        if (user_comment && status == 1) {
             socket.to(`${user_comment.socketId}`).emit("likecommentclient", comment, user);
         }
     })
@@ -110,7 +110,10 @@ const SocketServer = (socket, io) => {
     socket.on("comment", async ({ post, comment, user }) => {
         const user_post = users.find((user1) => post.user._id == user1.id);
         console.log(user_post)
-        socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
+        if (post.isnotify == true) {
+            socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
+        }
+
     })
     //trả lời comment
     socket.on("replycomment", async ({ comment, user }) => {

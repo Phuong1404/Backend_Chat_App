@@ -234,10 +234,14 @@ const getListImageUser = async (req: Request, res: Response, next: NextFunction)
     }
     else {
         for (let i in list_Image1) {
-            let temp = await Post.findById(list_Image1[i])
-            if (temp.ispublic) {
-                list_Image.push(list_Image1[i])
+
+            let temp = await Post.findById(list_Image1[i].res_id)
+            if (temp) {
+                if (temp.ispublic) {
+                    list_Image.push(list_Image1[i])
+                }
             }
+
         }
     }
     return res.json({

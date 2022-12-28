@@ -240,9 +240,11 @@ const getListImageUser = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
     else {
         for (let i in list_Image1) {
-            let temp = yield Post_model_1.default.findById(list_Image1[i]);
-            if (temp.ispublic) {
-                list_Image.push(list_Image1[i]);
+            let temp = yield Post_model_1.default.findById(list_Image1[i].res_id);
+            if (temp) {
+                if (temp.ispublic) {
+                    list_Image.push(list_Image1[i]);
+                }
             }
         }
     }

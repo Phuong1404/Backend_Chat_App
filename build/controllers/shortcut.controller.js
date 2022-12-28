@@ -21,9 +21,10 @@ const createShortcut = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (String(req.user['_id']) == String(shortcut)) {
             res.json({ "message": "Done" });
         }
-        const short1 = yield shortcut_model_1.default.findOne({ 'shortcut': shortcut });
+        const short1 = yield shortcut_model_1.default.findOne({ shortcut: shortcut, user: req.user['_id'] });
+        console.log(short1);
         if (short1) {
-            yield shortcut_model_1.default.findByIdAndDelete(shortcut);
+            yield shortcut_model_1.default.findByIdAndDelete(short1._id);
         }
         let newShortcut = new shortcut_model_1.default({
             _id: new mongoose_1.default.Types.ObjectId(),

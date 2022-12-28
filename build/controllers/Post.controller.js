@@ -112,6 +112,11 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             if (post2[i].ispublic) {
                 post1.push(post2[i]);
             }
+            else {
+                if (String(post2[i].user) == String(req.user['_id'])) {
+                    post1.push(post2[i]);
+                }
+            }
         }
         res.json({
             result: post1.length,
@@ -164,7 +169,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const { content, file_delete } = req.body;
         const post = yield Post_model_1.default.findById(req.params.id);
         //Bỏ những file bị bỏ đi
-        const new_attachment = post.attachment.filter(item => !file_delete.includes(item));
+        let new_attachment = post.attachment.filter(item => !file_delete.includes(item));
         const files = req.files;
         if (content.length === 0 && !files) {
             return res.status(400).json({ msg: "Please add content or image." });
@@ -186,10 +191,11 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 });
                 yield newAttachment.save();
                 listAttachment.push(newAttachment);
-                new_attachment.push(newAttachment.id);
+                new_attachment.push(newAttachment._id);
             }
             yield Post_model_1.default.findByIdAndUpdate({ _id: req.params.id }, {
-                content: Content
+                content: Content,
+                attachment: new_attachment
             }).then((result) => __awaiter(void 0, void 0, void 0, function* () {
                 if (result) {
                     for (let item in listAttachment) {
