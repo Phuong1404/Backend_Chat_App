@@ -8,6 +8,14 @@ import User from '../models/User.model'
 const createShortcut = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { shortcut } = req.body
+        if(String(req.user['_id'])==String(shortcut)){
+            res.json({"message":"Done"})
+        }
+        const short1=await ShortCut.findOne({'shortcut':shortcut})
+        if(short1)
+        {
+            await ShortCut.findByIdAndDelete(shortcut)
+        }
         let newShortcut = new ShortCut({
             _id: new mongoose.Types.ObjectId(),
             user: req.user['_id'],
@@ -16,9 +24,10 @@ const createShortcut = async (req: Request, res: Response, next: NextFunction) =
         await newShortcut.save()
         let shortcut1 = await ShortCut.find({ user: req.user['_id'] })
             .sort("-createdAt")
-        if (shortcut1.length > 10) {
-            await ShortCut.findByIdAndDelete(shortcut1[10].id)
+        if (shortcut1.length > 6) {
+            await ShortCut.findByIdAndDelete(shortcut1[6].id)
         }
+        res.json({"message":"Done"})
 
     }
     catch (err) {

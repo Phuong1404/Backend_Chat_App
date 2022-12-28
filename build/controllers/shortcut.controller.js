@@ -18,6 +18,13 @@ const shortcut_model_1 = __importDefault(require("../models/shortcut.model"));
 const createShortcut = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { shortcut } = req.body;
+        if (String(req.user['_id']) == String(shortcut)) {
+            res.json({ "message": "Done" });
+        }
+        const short1 = yield shortcut_model_1.default.findOne({ 'shortcut': shortcut });
+        if (short1) {
+            yield shortcut_model_1.default.findByIdAndDelete(shortcut);
+        }
         let newShortcut = new shortcut_model_1.default({
             _id: new mongoose_1.default.Types.ObjectId(),
             user: req.user['_id'],
@@ -26,9 +33,10 @@ const createShortcut = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         yield newShortcut.save();
         let shortcut1 = yield shortcut_model_1.default.find({ user: req.user['_id'] })
             .sort("-createdAt");
-        if (shortcut1.length > 10) {
-            yield shortcut_model_1.default.findByIdAndDelete(shortcut1[10].id);
+        if (shortcut1.length > 6) {
+            yield shortcut_model_1.default.findByIdAndDelete(shortcut1[6].id);
         }
+        res.json({ "message": "Done" });
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

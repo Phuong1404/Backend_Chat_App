@@ -94,7 +94,7 @@ app.use('/notify', Notification_route_1.default);
 app.use('/post', Post_route_1.default);
 app.use('/comment', Comment_route_1.default);
 app.use('/savepost', SavePost_route_1.default);
-app.use('/shortcutRoutes', shortcut_route_1.default);
+app.use('/shortcut', shortcut_route_1.default);
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

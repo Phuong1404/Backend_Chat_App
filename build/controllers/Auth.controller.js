@@ -238,7 +238,7 @@ const ResetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             password: yield bcrypt_1.default.hash(new_pass, 12)
         });
         const info = yield config_1.default.mail.sendMail({
-            from: 't.xuanphuong1404@outlook.com',
+            from: 'social.network.ck@outlook.com',
             to: email,
             subject: "Social Network - Đặt lại mật khẩu",
             html: `<strong>Mật khẩu mới của bạn là ${new_pass}</strong>`,

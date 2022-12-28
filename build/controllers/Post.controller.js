@@ -99,11 +99,11 @@ const getPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             user: [...req.user['friend'], req.user['_id']]
         }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id link");
+            .populate("attachment", "_id link");
         const populateQuery = [
             {
                 path: 'user.avatar',
-                select: '-_id link',
+                select: '_id link',
             },
         ];
         const post2 = yield Post_model_1.default.populate(post, populateQuery);
@@ -133,7 +133,7 @@ const getPostsUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const populateQuery = [
             {
                 path: 'user.avatar',
-                select: '-_id link',
+                select: '_id link',
             },
         ];
         const post2 = yield Post_model_1.default.populate(post, populateQuery);

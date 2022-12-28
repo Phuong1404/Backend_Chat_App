@@ -16,12 +16,12 @@ const MONGO_OPTIONS = {
 };
 const transporter = nodemailer_1.default.createTransport({
     service: 'hotmail',
-    port: 587,
+    port: 25,
     secure: false,
     requireTLS: true,
     auth: {
-        user: 't.xuanphuong1404@outlook.com',
-        pass: 'phuong1404',
+        user: 'social.network.ck@outlook.com',
+        pass: '14042001Aa',
     },
     logger: true
 });

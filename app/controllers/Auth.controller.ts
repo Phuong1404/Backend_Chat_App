@@ -252,7 +252,7 @@ const ResetPassword = async (req: Request, res: Response, next: NextFunction) =>
             password: await bcrypt.hash(new_pass, 12)
         })
         const info = await config.mail.sendMail({
-            from: 't.xuanphuong1404@outlook.com',
+            from: 'social.network.ck@outlook.com',
             to: email,
             subject: "Social Network - Đặt lại mật khẩu",
             html: `<strong>Mật khẩu mới của bạn là ${new_pass}</strong>`,

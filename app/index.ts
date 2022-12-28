@@ -101,7 +101,7 @@ app.use('/notify', notifyRoutes)
 app.use('/post', postRoutes)
 app.use('/comment', commentRoutes)
 app.use('/savepost', savePostRoutes)
-app.use('/shortcutRoutes', shortcutRoutes)
+app.use('/shortcut', shortcutRoutes)
 /** Error handling */
 app.use((req, res, next) => {
     const error = new Error('Not found');

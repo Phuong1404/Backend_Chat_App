@@ -93,11 +93,11 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
             user: [...req.user['friend'], req.user['_id']]
         }).sort("-createdAt")
             .populate("user", "name avatar")
-            .populate("attachment", "-_id link")
+            .populate("attachment", "_id link")
         const populateQuery = [
             {
                 path: 'user.avatar',
-                select: '-_id link',
+                select: '_id link',
             },
         ];
         const post2 = await Post.populate(post, populateQuery);
@@ -127,7 +127,7 @@ const getPostsUser = async (req: Request, res: Response, next: NextFunction) => 
         const populateQuery = [
             {
                 path: 'user.avatar',
-                select: '-_id link',
+                select: '_id link',
             },
         ];
         const post2 = await Post.populate(post, populateQuery);
