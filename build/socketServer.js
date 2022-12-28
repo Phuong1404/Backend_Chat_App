@@ -96,7 +96,7 @@ const SocketServer = (socket, io) => {
         console.log(users);
         if (users) {
             const user_post = users.find((user1) => post.user._id == user1.id);
-            if (user_post && status == 1 && post.isnotify == true) {
+            if (user_post && status == 1) {
                 socket.to(`${user_post.socketId}`).emit("likepostclient", post, user);
             }
         }
@@ -113,9 +113,7 @@ const SocketServer = (socket, io) => {
     socket.on("comment", ({ post, comment, user }) => __awaiter(void 0, void 0, void 0, function* () {
         const user_post = users.find((user1) => post.user._id == user1.id);
         console.log(user_post);
-        if (post.isnotify == true) {
-            socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
-        }
+        socket.to(`${user_post.socketId}`).emit("commentpostclient", post, comment, user);
     }));
     //trả lời comment
     socket.on("replycomment", ({ comment, user }) => __awaiter(void 0, void 0, void 0, function* () {
