@@ -107,7 +107,7 @@ const getPosts = async (req: Request, res: Response, next: NextFunction) => {
                 post1.push(post2[i])
             }
             else {
-                if (String(post2[i].user) == String(req.user['_id'])) {
+                if (String(post2[i].user['_id']) == String(req.user['_id'])) {
                     post1.push(post2[i])
                 }
             }
