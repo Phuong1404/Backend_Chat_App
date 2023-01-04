@@ -252,7 +252,7 @@ const suggestionUser = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 //6. Get All User Not Friend
 const allUserNotFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const newArr = [...req.user['friend'], req.user['_id']];
-    const user = yield User_model_1.default.find({ id: { $nin: newArr } })
+    const user = yield User_model_1.default.find({ _id: { $nin: newArr } })
         .select('_id name')
         .populate("avatar", "-_id link");
     return res.json({

@@ -246,7 +246,7 @@ const suggestionUser = async (req: Request, res: Response, next: NextFunction) =
 //6. Get All User Not Friend
 const allUserNotFriend = async (req: Request, res: Response, next: NextFunction) => {
     const newArr = [...req.user['friend'], req.user['_id']];
-    const user = await User.find({ id: { $nin: newArr } })
+    const user = await User.find({ _id: { $nin: newArr } })
         .select('_id name')
         .populate("avatar", "-_id link")
     return res.json({
