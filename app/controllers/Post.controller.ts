@@ -162,11 +162,9 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const { content, file_delete } = req.body
-
         const post = await Post.findById(req.params.id)
         //Bỏ những file bị bỏ đi
         let new_attachment = post.attachment.filter(item => !file_delete.includes(item));
-
 
         const files = req.files
         if (content.length === 0 && !files) {

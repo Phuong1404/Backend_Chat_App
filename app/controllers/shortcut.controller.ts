@@ -8,28 +8,27 @@ import User from '../models/User.model'
 const createShortcut = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { shortcut } = req.body
-        if(String(req.user['_id'])==String(shortcut)){
-            res.json({"message":"Done"})
+        if (String(req.user['_id']) == String(shortcut)) {
+            res.json({ "message": "Done" })
         }
-        const short1=await ShortCut.findOne({shortcut:shortcut,user:req.user['_id']})
-        console.log(short1)
-        if(short1)
-        {
-            await ShortCut.findByIdAndDelete(short1._id)
+        else {
+            const short1 = await ShortCut.findOne({ shortcut: shortcut, user: req.user['_id'] })
+            if (short1) {
+                await ShortCut.findByIdAndDelete(short1._id)
+            }
+            let newShortcut = new ShortCut({
+                _id: new mongoose.Types.ObjectId(),
+                user: req.user['_id'],
+                shortcut: shortcut
+            })
+            await newShortcut.save()
+            let shortcut1 = await ShortCut.find({ user: req.user['_id'] })
+                .sort("-createdAt")
+            if (shortcut1.length > 6) {
+                await ShortCut.findByIdAndDelete(shortcut1[6].id)
+            }
+            res.json({ "message": "Done" })
         }
-        let newShortcut = new ShortCut({
-            _id: new mongoose.Types.ObjectId(),
-            user: req.user['_id'],
-            shortcut: shortcut
-        })
-        await newShortcut.save()
-        let shortcut1 = await ShortCut.find({ user: req.user['_id'] })
-            .sort("-createdAt")
-        if (shortcut1.length > 6) {
-            await ShortCut.findByIdAndDelete(shortcut1[6].id)
-        }
-        res.json({"message":"Done"})
-
     }
     catch (err) {
         return res.status(500).json({ message: err.message });

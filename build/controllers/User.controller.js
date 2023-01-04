@@ -187,6 +187,36 @@ const listFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: error.message });
     }
 });
+const listFriendUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user_id = req.params.id;
+        const user = yield User_model_1.default.findById(user_id);
+        const list_friend = user.friend;
+        let FriendList = [];
+        for (let friend in list_friend) {
+            let friend1 = yield User_model_1.default.findById(list_friend[friend]);
+            let avatar = "";
+            if (friend1.avatar) {
+                const attachment = yield Attachment_model_1.default.findOne({ _id: friend1.avatar });
+                if (attachment) {
+                    avatar = attachment.link;
+                }
+            }
+            const val = {
+                "_id": friend1._id,
+                "name": friend1.name,
+                "avatar": avatar,
+                "gender": friend1.gender,
+                "friend": friend1.friend.length,
+            };
+            FriendList.push(val);
+        }
+        res.json(FriendList);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+});
 //5. Đề xuất bạn bè
 const suggestionUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -255,6 +285,6 @@ const getListImageUser = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 });
 exports.default = {
     getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic,
-    suggestionUser, allUserNotFriend, getListImageUser
+    suggestionUser, allUserNotFriend, getListImageUser, listFriendUser
 };
 //# sourceMappingURL=User.controller.js.map

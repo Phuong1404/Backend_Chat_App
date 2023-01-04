@@ -17,5 +17,6 @@ router.get("/get/public/:id", User_controller_1.default.getUserPublic);
 router.get("/suggestion", extractJWT_1.default, User_controller_1.default.suggestionUser);
 router.get("/not/friend", extractJWT_1.default, User_controller_1.default.allUserNotFriend);
 router.get("/listimage/:id", extractJWT_1.default, User_controller_1.default.getListImageUser);
+router.get("/getfiend/:id", extractJWT_1.default, User_controller_1.default.listFriendUser);
 module.exports = router;
 //# sourceMappingURL=User.route.js.map

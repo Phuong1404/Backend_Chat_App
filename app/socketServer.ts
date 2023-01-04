@@ -122,14 +122,12 @@ const SocketServer = (socket, io) => {
     //gửi lời mời kết bạn
     socket.on("sendfriendrequest", async ({ request, user }) => {
         const user_send = users.find((user1) => request.recever == user1.id);
-        console.log(user_send)
-        socket.to(`${user_send.socketId}`).emit("sendfriendrequestclient", request, user);
+        user_send && socket.to(`${user_send.socketId}`).emit("sendfriendrequestclient", request, user);
     })
     //chấp nhận lời mời kết bạn
     socket.on("acceptfriendrequest", async ({ request, user }) => {
         const user_accept = users.find((user1) => request.sender == user1.id);
-        console.log(user_accept)
-        socket.to(`${user_accept.socketId}`).emit("acceptfriendrequest", request, user);
+        user_accept && socket.to(`${user_accept.socketId}`).emit("acceptfriendrequest", request, user);
     })
     // //Send friend request
     // socket.on("sendRequest", (msg) => {

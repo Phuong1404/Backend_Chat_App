@@ -24,22 +24,24 @@ const sendRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         if (request1) {
             return res.status(400).json({ message: "Đã gửi lời mời" });
         }
-        const newRequest = new FriendRequest_model_1.default({
-            _id: new mongoose_1.default.Types.ObjectId(),
-            sender: req.user['_id'],
-            recever: recever_id,
-            status: 0,
-            status_name: "Send",
-            user: [recever_id, req.user['_id']]
-        });
-        yield newRequest.save();
-        yield User_model_1.default.findOneAndUpdate({ _id: req.user['_id'] }, {
-            $push: { friend_request: newRequest._id }
-        });
-        yield User_model_1.default.findOneAndUpdate({ _id: recever_id }, {
-            $push: { friend_request: newRequest._id }
-        });
-        res.json({ message: "Send success!" });
+        else {
+            const newRequest = new FriendRequest_model_1.default({
+                _id: new mongoose_1.default.Types.ObjectId(),
+                sender: req.user['_id'],
+                recever: recever_id,
+                status: 0,
+                status_name: "Send",
+                user: [recever_id, req.user['_id']]
+            });
+            yield newRequest.save();
+            yield User_model_1.default.findOneAndUpdate({ _id: req.user['_id'] }, {
+                $push: { friend_request: newRequest._id }
+            });
+            yield User_model_1.default.findOneAndUpdate({ _id: recever_id }, {
+                $push: { friend_request: newRequest._id }
+            });
+            res.json({ message: "Send success!" });
+        }
     }
     catch (error) {
         return res.status(500).json({ message: error.message });

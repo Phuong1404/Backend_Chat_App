@@ -181,6 +181,36 @@ const listFriend = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({ message: error.message })
     }
 }
+const listFriendUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user_id = req.params.id
+        const user = await User.findById(user_id)
+        const list_friend = user.friend
+        let FriendList = []
+        for (let friend in list_friend) {
+            let friend1 = await User.findById(list_friend[friend])
+            let avatar = ""
+            if (friend1.avatar) {
+                const attachment = await Attachment.findOne({ _id: friend1.avatar })
+                if (attachment) {
+                    avatar = attachment.link
+                }
+            }
+            const val = {
+                "_id": friend1._id,
+                "name": friend1.name,
+                "avatar": avatar,
+                "gender": friend1.gender,
+                "friend": friend1.friend.length,
+            }
+            FriendList.push(val)
+        }
+        res.json(FriendList)
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
 //5. Đề xuất bạn bè
 const suggestionUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -251,5 +281,5 @@ const getListImageUser = async (req: Request, res: Response, next: NextFunction)
 }
 export default {
     getUser, searchUser, updateUser, getMyUser, listFriend, getUserPublic,
-    suggestionUser, allUserNotFriend, getListImageUser
+    suggestionUser, allUserNotFriend, getListImageUser,listFriendUser
 }

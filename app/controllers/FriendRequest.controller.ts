@@ -11,28 +11,30 @@ const sendRequest = async (req: Request, res: Response, next: NextFunction) => {
         if (request1) {
             return res.status(400).json({ message: "Đã gửi lời mời" });
         }
-        const newRequest = new FriendRequest({
-            _id: new mongoose.Types.ObjectId(),
-            sender: req.user['_id'],
-            recever: recever_id,
-            status: 0,
-            status_name: "Send",
-            user: [recever_id, req.user['_id']]
-        })
-        await newRequest.save()
-        await User.findOneAndUpdate(
-            { _id: req.user['_id'] },
-            {
-                $push: { friend_request: newRequest._id }
-            }
-        );
-        await User.findOneAndUpdate(
-            { _id: recever_id },
-            {
-                $push: { friend_request: newRequest._id }
-            }
-        );
-        res.json({ message: "Send success!" });
+        else {
+            const newRequest = new FriendRequest({
+                _id: new mongoose.Types.ObjectId(),
+                sender: req.user['_id'],
+                recever: recever_id,
+                status: 0,
+                status_name: "Send",
+                user: [recever_id, req.user['_id']]
+            })
+            await newRequest.save()
+            await User.findOneAndUpdate(
+                { _id: req.user['_id'] },
+                {
+                    $push: { friend_request: newRequest._id }
+                }
+            );
+            await User.findOneAndUpdate(
+                { _id: recever_id },
+                {
+                    $push: { friend_request: newRequest._id }
+                }
+            );
+            res.json({ message: "Send success!" });
+        }
     }
     catch (error) {
         return res.status(500).json({ message: error.message });
@@ -155,8 +157,8 @@ const ListRequestRequest = async (req: Request, res: Response, next: NextFunctio
 //6. Xóa bạn bè
 const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => {
     //Tìm danh sách channel
-    const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } },{ user: { $all: [req.params.id] } }, { num_member: 2 }] })
-    await Channel.findByIdAndRemove({_id:channel._id})
+    const channel = await Channel.findOne({ $and: [{ user: { $all: [req.user['_id']] } }, { user: { $all: [req.params.id] } }, { num_member: 2 }] })
+    await Channel.findByIdAndRemove({ _id: channel._id })
     const user = await User.findById(req.user['_id'])
     if (user.friend.findIndex(u => String(u) == String(req.user['_id'])) != -1) {
         return res.status(400).json({ message: "Not friends" });
@@ -175,8 +177,8 @@ const DeleteFriend = async (req: Request, res: Response, next: NextFunction) => 
     if (request) {
         await FriendRequest.findByIdAndDelete({ _id: request._id })
     }
-    res.json({"message":"Delete success"})
+    res.json({ "message": "Delete success" })
 }
 export default {
-    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest,DeleteFriend
+    sendRequest, RejectRequest, CancelRequest, AcceptRequest, ListRequestRequest, DeleteFriend
 }
